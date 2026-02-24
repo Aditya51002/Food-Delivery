@@ -24,6 +24,7 @@ const AdminLayout = ({ children }) => {
 
   const links = [
     { to: "/admin/dashboard", label: "Dashboard", icon: <FiHome size={18} /> },
+    { to: "/admin/foods", label: "Food Items", icon: <FiList size={18} /> },
     { to: "/admin/restaurants", label: "Restaurants", icon: <MdRestaurantMenu size={18} /> },
     { to: "/admin/orders", label: "Orders", icon: <FiShoppingBag size={18} /> },
   ];

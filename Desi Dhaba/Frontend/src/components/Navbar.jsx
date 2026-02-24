@@ -72,6 +72,14 @@ const Navbar = () => {
                 </Link>
               </div>
             )}
+            {/* Admin Login – always visible */}
+            <Link
+              to="/admin/login"
+              className="ml-2 flex items-center space-x-1 text-xs bg-orange-800 hover:bg-orange-900 px-3 py-1.5 rounded-lg font-medium transition opacity-80 hover:opacity-100"
+            >
+              <span>🔐</span>
+              <span>Admin</span>
+            </Link>
           </div>
 
           {/* Mobile Hamburger */}
@@ -108,6 +116,13 @@ const Navbar = () => {
                 </Link>
               </>
             )}
+            <Link
+              to="/admin/login"
+              onClick={() => setMobileOpen(false)}
+              className="block py-2 text-orange-200 hover:text-white font-medium"
+            >
+              🔐 Admin Login
+            </Link>
           </div>
         )}
       </div>

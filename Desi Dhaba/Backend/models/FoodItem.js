@@ -5,11 +5,17 @@ const foodItemSchema = new mongoose.Schema(
     restaurantId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Restaurant",
-      required: true,
+      required: false,
+      default: null,
     },
     name: {
       type: String,
       required: [true, "Food item name is required"],
+      trim: true,
+    },
+    description: {
+      type: String,
+      default: "",
       trim: true,
     },
     image: {
@@ -25,6 +31,12 @@ const foodItemSchema = new mongoose.Schema(
       type: String,
       required: [true, "Category is required"],
       trim: true,
+    },
+    rating: {
+      type: Number,
+      default: 4.0,
+      min: 0,
+      max: 5,
     },
     isAvailable: {
       type: Boolean,

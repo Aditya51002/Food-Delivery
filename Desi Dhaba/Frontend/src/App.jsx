@@ -21,6 +21,7 @@ import Orders from "./pages/Orders";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRestaurants from "./pages/admin/AdminRestaurants";
 import AdminFoods from "./pages/admin/AdminFoods";
+import AdminFoodsGlobal from "./pages/admin/AdminFoodsGlobal";
 import AdminOrders from "./pages/admin/AdminOrders";
 
 // Protected Route Components
@@ -106,6 +107,14 @@ function App() {
           element={
             <AdminRoute>
               <AdminLayout><AdminOrders /></AdminLayout>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/foods"
+          element={
+            <AdminRoute>
+              <AdminLayout><AdminFoodsGlobal /></AdminLayout>
             </AdminRoute>
           }
         />
