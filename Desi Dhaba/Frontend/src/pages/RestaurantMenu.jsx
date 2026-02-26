@@ -9,7 +9,7 @@ import { FiPlus, FiMapPin } from "react-icons/fi";
 const RestaurantMenu = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const { addToCart } = useCart();
+  const { incrementItem } = useCart();
   const [restaurant, setRestaurant] = useState(null);
   const [foods, setFoods] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,7 @@ const RestaurantMenu = () => {
     }
     setAddingId(foodId);
     try {
-      await addToCart(foodId, 1);
+      await incrementItem(foodId);
       toast.success("Added to cart!");
     } catch {
       toast.error("Failed to add to cart");

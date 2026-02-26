@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import { FiShoppingCart, FiUser, FiLogOut, FiMenu, FiX } from "react-icons/fi";
+import { FiShoppingCart, FiUser, FiLogOut, FiMenu, FiX, FiSettings } from "react-icons/fi";
+import { MdOutlineRiceBowl } from "react-icons/md";
 import { useState } from "react";
 
 const Navbar = () => {
@@ -21,7 +22,8 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold tracking-tight">🍛 Desi Dhaba</span>
+            <MdOutlineRiceBowl size={26} className="text-yellow-300" />
+            <span className="text-2xl font-bold tracking-tight">Desi Dhaba</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -77,7 +79,7 @@ const Navbar = () => {
               to="/admin/login"
               className="ml-2 flex items-center space-x-1 text-xs bg-orange-800 hover:bg-orange-900 px-3 py-1.5 rounded-lg font-medium transition opacity-80 hover:opacity-100"
             >
-              <span>🔐</span>
+              <FiSettings size={13} />
               <span>Admin</span>
             </Link>
           </div>
@@ -119,9 +121,9 @@ const Navbar = () => {
             <Link
               to="/admin/login"
               onClick={() => setMobileOpen(false)}
-              className="block py-2 text-orange-200 hover:text-white font-medium"
+              className="block py-2 text-orange-200 hover:text-white font-medium flex items-center gap-1.5"
             >
-              🔐 Admin Login
+              <FiSettings size={13} /> Admin Login
             </Link>
           </div>
         )}

@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+/* Hide scrollbar cross-browser (used for category tab row) */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

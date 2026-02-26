@@ -65,14 +65,14 @@ const Checkout = () => {
                   <span className="text-gray-600">
                     {food.name} × {item.quantity}
                   </span>
-                  <span className="font-medium">₹{food.price * item.quantity}</span>
+                  <span className="font-medium">&#8377;{food.price * item.quantity}</span>
                 </div>
               );
             })}
           </div>
           <div className="border-t mt-4 pt-4 flex justify-between text-lg font-bold">
             <span>Total</span>
-            <span className="text-orange-600">₹{cart.totalAmount}</span>
+            <span className="text-orange-600">&#8377;{cart.totalAmount}</span>
           </div>
         </div>
 

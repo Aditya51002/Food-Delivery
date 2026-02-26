@@ -8,7 +8,7 @@ import {
   FiMenu,
   FiX,
 } from "react-icons/fi";
-import { MdRestaurantMenu } from "react-icons/md";
+import { MdRestaurantMenu, MdOutlineRiceBowl } from "react-icons/md";
 import { useState } from "react";
 
 const AdminLayout = ({ children }) => {
@@ -40,7 +40,10 @@ const AdminLayout = ({ children }) => {
         } md:translate-x-0 md:static md:block`}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-700">
-          <span className="text-xl font-bold">🍛 Admin Panel</span>
+          <div className="flex items-center space-x-2">
+            <MdOutlineRiceBowl size={22} className="text-yellow-400" />
+            <span className="text-xl font-bold">Admin Panel</span>
+          </div>
           <button className="md:hidden text-gray-400" onClick={() => setSidebarOpen(false)}>
             <FiX size={20} />
           </button>

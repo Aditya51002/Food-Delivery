@@ -2,6 +2,7 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FiTrash2, FiPlus, FiMinus, FiShoppingBag } from "react-icons/fi";
+import { MdOutlineRestaurant } from "react-icons/md";
 
 const Cart = () => {
   const { cart, addToCart, removeFromCart, loading } = useCart();
@@ -71,12 +72,14 @@ const Cart = () => {
                 {food.image ? (
                   <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl">🍽️</div>
+                  <div className="w-full h-full flex items-center justify-center">
+                    <MdOutlineRestaurant size={36} className="text-gray-400" />
+                  </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-800 truncate">{food.name}</h3>
-                <p className="text-orange-600 font-bold">₹{food.price}</p>
+                <p className="text-orange-600 font-bold">&#8377;{food.price}</p>
               </div>
               <div className="flex items-center space-x-2">
                 <button
@@ -94,7 +97,7 @@ const Cart = () => {
                 </button>
               </div>
               <div className="text-right min-w-[70px]">
-                <p className="font-bold text-gray-800">₹{food.price * item.quantity}</p>
+                <p className="font-bold text-gray-800">&#8377;{food.price * item.quantity}</p>
               </div>
               <button
                 onClick={() => handleRemove(food._id)}
@@ -111,7 +114,7 @@ const Cart = () => {
       <div className="bg-white rounded-xl shadow-md p-6 mt-6">
         <div className="flex justify-between items-center text-xl font-bold text-gray-800 mb-4">
           <span>Total</span>
-          <span className="text-orange-600">₹{cart.totalAmount}</span>
+          <span className="text-orange-600">&#8377;{cart.totalAmount}</span>
         </div>
         <button
           onClick={() => navigate("/checkout")}
