@@ -1,9 +1,6 @@
 const Restaurant = require("../models/Restaurant");
 const { cloudinary } = require("../config/cloudinary");
 
-// @desc    Create restaurant
-// @route   POST /api/restaurants
-// @access  Admin
 const createRestaurant = async (req, res) => {
   try {
     const { name, description, address, isActive } = req.body;
@@ -23,9 +20,6 @@ const createRestaurant = async (req, res) => {
   }
 };
 
-// @desc    Get all restaurants
-// @route   GET /api/restaurants
-// @access  Public
 const getRestaurants = async (req, res) => {
   try {
     const restaurants = await Restaurant.find().sort({ createdAt: -1 });
@@ -35,9 +29,6 @@ const getRestaurants = async (req, res) => {
   }
 };
 
-// @desc    Get single restaurant
-// @route   GET /api/restaurants/:id
-// @access  Public
 const getRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);
@@ -50,9 +41,6 @@ const getRestaurant = async (req, res) => {
   }
 };
 
-// @desc    Update restaurant
-// @route   PUT /api/restaurants/:id
-// @access  Admin
 const updateRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);
@@ -68,13 +56,11 @@ const updateRestaurant = async (req, res) => {
     restaurant.isActive = isActive !== undefined ? isActive : restaurant.isActive;
 
     if (req.file) {
-      // Delete old image from Cloudinary if exists
       if (restaurant.image) {
         const publicId = restaurant.image.split("/").slice(-2).join("/").split(".")[0];
         try {
           await cloudinary.uploader.destroy(publicId);
         } catch (e) {
-          // Ignore cloudinary deletion errors
         }
       }
       restaurant.image = req.file.path;
@@ -87,23 +73,17 @@ const updateRestaurant = async (req, res) => {
   }
 };
 
-// @desc    Delete restaurant
-// @route   DELETE /api/restaurants/:id
-// @access  Admin
 const deleteRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
-
-    // Delete image from Cloudinary
     if (restaurant.image) {
       const publicId = restaurant.image.split("/").slice(-2).join("/").split(".")[0];
       try {
         await cloudinary.uploader.destroy(publicId);
       } catch (e) {
-        // Ignore
       }
     }
 

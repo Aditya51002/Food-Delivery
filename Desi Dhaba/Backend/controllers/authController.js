@@ -6,9 +6,6 @@ const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public
 const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -45,10 +42,6 @@ const register = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -80,10 +73,6 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// @desc    Get current user profile
-// @route   GET /api/auth/me
-// @access  Private
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");

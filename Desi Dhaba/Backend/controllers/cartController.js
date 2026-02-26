@@ -1,9 +1,6 @@
 const Cart = require("../models/Cart");
 const FoodItem = require("../models/FoodItem");
 
-// @desc    Add item to cart (or update quantity)
-// @route   POST /api/cart/add
-// @access  User
 const addToCart = async (req, res) => {
   try {
     const { foodId, quantity } = req.body;
@@ -23,14 +20,11 @@ const addToCart = async (req, res) => {
     if (!cart) {
       cart = new Cart({ userId, items: [], totalAmount: 0 });
     }
-
-    // Check if item already exists in cart
     const existingItemIndex = cart.items.findIndex(
       (item) => item.foodId.toString() === foodId
     );
 
     if (existingItemIndex > -1) {
-      // Update quantity
       const newQty = quantity !== undefined ? quantity : cart.items[existingItemIndex].quantity + 1;
       if (newQty <= 0) {
         cart.items.splice(existingItemIndex, 1);
@@ -40,8 +34,6 @@ const addToCart = async (req, res) => {
     } else {
       cart.items.push({ foodId, quantity: quantity || 1 });
     }
-
-    // Recalculate total
     let total = 0;
     for (const item of cart.items) {
       const foodData = await FoodItem.findById(item.foodId);
@@ -52,8 +44,6 @@ const addToCart = async (req, res) => {
     cart.totalAmount = total;
 
     await cart.save();
-
-    // Populate and return
     const populatedCart = await Cart.findById(cart._id).populate("items.foodId");
     res.json(populatedCart);
   } catch (error) {
@@ -61,9 +51,6 @@ const addToCart = async (req, res) => {
   }
 };
 
-// @desc    Get user cart
-// @route   GET /api/cart
-// @access  User
 const getCart = async (req, res) => {
   try {
     let cart = await Cart.findOne({ userId: req.user._id }).populate("items.foodId");
@@ -77,10 +64,6 @@ const getCart = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// @desc    Remove item from cart
-// @route   DELETE /api/cart/remove/:foodId
-// @access  User
 const removeFromCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.user._id });
@@ -92,7 +75,6 @@ const removeFromCart = async (req, res) => {
       (item) => item.foodId.toString() !== req.params.foodId
     );
 
-    // Recalculate total
     let total = 0;
     for (const item of cart.items) {
       const foodData = await FoodItem.findById(item.foodId);
@@ -110,10 +92,6 @@ const removeFromCart = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// @desc    Clear cart
-// @route   DELETE /api/cart/clear
-// @access  User
 const clearCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.user._id });

@@ -1,9 +1,6 @@
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 
-// @desc    Place order from cart
-// @route   POST /api/orders
-// @access  User
 const placeOrder = async (req, res) => {
   try {
     const { deliveryAddress, paymentMethod } = req.body;
@@ -17,7 +14,7 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
-    // Build order items snapshot
+
     const orderItems = cart.items.map((item) => ({
       foodId: item.foodId._id,
       name: item.foodId.name,
@@ -34,8 +31,6 @@ const placeOrder = async (req, res) => {
       paymentMethod: paymentMethod || "COD",
       status: "Pending",
     });
-
-    // Clear cart after ordering
     cart.items = [];
     cart.totalAmount = 0;
     await cart.save();
@@ -46,9 +41,6 @@ const placeOrder = async (req, res) => {
   }
 };
 
-// @desc    Get user orders
-// @route   GET /api/orders/user
-// @access  User
 const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user._id }).sort({ createdAt: -1 });
@@ -58,9 +50,6 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-// @desc    Get all orders (admin)
-// @route   GET /api/orders/admin
-// @access  Admin
 const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
@@ -72,9 +61,6 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-// @desc    Update order status
-// @route   PUT /api/orders/:id/status
-// @access  Admin
 const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;

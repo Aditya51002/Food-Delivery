@@ -1,12 +1,4 @@
-/**
- * Seed Script – Desi Dhaba
- * Run: node seed.js
- *
- * Creates:
- *  • 1 default Admin user  (admin@dessidhaba.com / Admin@123)
- *  • 1 default Restaurant
- *  • 27 food items across 6 categories
- */
+
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -19,7 +11,6 @@ const Restaurant = require("./models/Restaurant");
 const FoodItem = require("./models/FoodItem");
 
 const foodItems = [
-  // ─── Pizza ───────────────────────────────────────────────────────────────
   {
     name: "Classic Margherita Pizza",
     description: "Fresh mozzarella, tomato sauce & basil on a crispy hand-tossed base",
@@ -55,8 +46,6 @@ const foodItems = [
     category: "Pizza",
     rating: 4.3,
   },
-
-  // ─── Burgers ─────────────────────────────────────────────────────────────
   {
     name: "Classic Beef Burger",
     description: "Juicy beef patty, lettuce, tomato, pickles & special sauce",
@@ -92,8 +81,6 @@ const foodItems = [
     category: "Burgers",
     rating: 4.3,
   },
-
-  // ─── Fast Food ───────────────────────────────────────────────────────────
   {
     name: "Masala French Fries",
     description: "Crispy fries tossed with chaat masala & green chutney dip",
@@ -129,8 +116,6 @@ const foodItems = [
     category: "Fast Food",
     rating: 4.2,
   },
-
-  // ─── Bakery ──────────────────────────────────────────────────────────────
   {
     name: "Chocolate Truffle Cake",
     description: "Rich dark chocolate ganache layered cake – pure indulgence",
@@ -166,8 +151,6 @@ const foodItems = [
     category: "Bakery",
     rating: 4.7,
   },
-
-  // ─── Indian ──────────────────────────────────────────────────────────────
   {
     name: "Butter Chicken",
     description: "Tender chicken in a creamy tomato-butter sauce – The classic",
@@ -196,8 +179,6 @@ const foodItems = [
     category: "Indian",
     rating: 4.9,
   },
-
-  // ─── Drinks ──────────────────────────────────────────────────────────────
   {
     name: "Mango Lassi",
     description: "Chilled Alphonso mango blended with thick yoghurt & cardamom",
@@ -225,8 +206,6 @@ const seed = async () => {
   await connectDB();
 
   console.log("🌱 Starting Desi Dhaba seed...\n");
-
-  // ── Admin User ────────────────────────────────────────────────────────────
   let admin = await User.findOne({ email: "admin@desidhaba.com" });
   if (!admin) {
     const salt = await bcrypt.genSalt(10);
@@ -241,8 +220,6 @@ const seed = async () => {
   } else {
     console.log("ℹ️  Admin user already exists – skipping");
   }
-
-  // ── Default Restaurant ────────────────────────────────────────────────────
   let restaurant = await Restaurant.findOne({ name: "Desi Dhaba Kitchen" });
   if (!restaurant) {
     restaurant = await Restaurant.create({
@@ -256,7 +233,6 @@ const seed = async () => {
     console.log("ℹ️  Default restaurant already exists – skipping");
   }
 
-  // ── Food Items ────────────────────────────────────────────────────────────
   const existing = await FoodItem.countDocuments({});
   if (existing === 0) {
     const docs = foodItems.map((f) => ({ ...f, restaurantId: restaurant._id, isAvailable: true }));

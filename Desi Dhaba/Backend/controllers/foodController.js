@@ -1,9 +1,6 @@
 const FoodItem = require("../models/FoodItem");
 const { cloudinary } = require("../config/cloudinary");
 
-// @desc    Get ALL food items (with optional category filter)
-// @route   GET /api/foods
-// @access  Public
 const getAllFoods = async (req, res) => {
   try {
     const { category } = req.query;
@@ -16,9 +13,6 @@ const getAllFoods = async (req, res) => {
   }
 };
 
-// @desc    Get distinct food categories
-// @route   GET /api/foods/categories
-// @access  Public
 const getCategories = async (req, res) => {
   try {
     const categories = await FoodItem.distinct("category", { isAvailable: true });
@@ -28,9 +22,6 @@ const getCategories = async (req, res) => {
   }
 };
 
-// @desc    Create food item globally (no restaurantId needed)
-// @route   POST /api/foods/create
-// @access  Admin
 const createGlobalFoodItem = async (req, res) => {
   try {
     const { name, price, category, isAvailable, rating, description } = req.body;
@@ -51,10 +42,6 @@ const createGlobalFoodItem = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// @desc    Create food item for a restaurant
-// @route   POST /api/foods/:restaurantId
-// @access  Admin
 const createFoodItem = async (req, res) => {
   try {
     const { name, price, category, isAvailable, rating, description } = req.body;
@@ -76,10 +63,6 @@ const createFoodItem = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// @desc    Get all food items for a restaurant
-// @route   GET /api/foods/:restaurantId
-// @access  Public
 const getFoodsByRestaurant = async (req, res) => {
   try {
     const foods = await FoodItem.find({ restaurantId: req.params.restaurantId }).sort({
@@ -91,10 +74,6 @@ const getFoodsByRestaurant = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// @desc    Update food item
-// @route   PUT /api/foods/:id
-// @access  Admin
 const updateFoodItem = async (req, res) => {
   try {
     const food = await FoodItem.findById(req.params.id);
@@ -130,9 +109,6 @@ const updateFoodItem = async (req, res) => {
   }
 };
 
-// @desc    Delete food item
-// @route   DELETE /api/foods/:id
-// @access  Admin
 const deleteFoodItem = async (req, res) => {
   try {
     const food = await FoodItem.findById(req.params.id);
