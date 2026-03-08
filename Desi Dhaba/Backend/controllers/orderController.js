@@ -206,4 +206,50 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder, getUserOrders, getOrderById, cancelOrder, getAllOrders, updateOrderStatus };
+// ─── Reorder: Merge Past Order Items into Cart ───────────────────────────────
+const reorder = async (req, res) => {
+  try {
+    const FoodItem = require("../models/FoodItem");
+
+    const order = await Order.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    let cart = await Cart.findOne({ userId: req.user._id });
+    if (!cart) cart = new Cart({ userId: req.user._id, items: [], totalAmount: 0 });
+
+    let addedCount = 0;
+    for (const item of order.items) {
+      if (!item.foodId) continue;
+      const food = await FoodItem.findById(item.foodId);
+      if (!food || !food.isAvailable) continue;
+
+      const idx = cart.items.findIndex((i) => i.foodId.toString() === item.foodId.toString());
+      if (idx > -1) {
+        cart.items[idx].quantity += item.quantity;
+      } else {
+        cart.items.push({ foodId: item.foodId, quantity: item.quantity });
+      }
+      addedCount++;
+    }
+
+    if (addedCount === 0) {
+      return res.status(400).json({ message: "No available items from this order to reorder" });
+    }
+
+    // Recalculate total
+    let total = 0;
+    for (const cartItem of cart.items) {
+      const food = await FoodItem.findById(cartItem.foodId);
+      if (food) total += food.price * cartItem.quantity;
+    }
+    cart.totalAmount = total;
+    await cart.save();
+
+    const populated = await Cart.findById(cart._id).populate("items.foodId");
+    res.json(populated);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = { placeOrder, getUserOrders, getOrderById, cancelOrder, getAllOrders, updateOrderStatus, reorder };
