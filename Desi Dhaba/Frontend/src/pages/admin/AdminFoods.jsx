@@ -130,7 +130,6 @@ const AdminFoods = () => {
         </button>
       </div>
 
-      {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
@@ -204,7 +203,6 @@ const AdminFoods = () => {
         </div>
       )}
 
-      {/* Food Items Grid */}
       {foods.length === 0 ? (
         <p className="text-gray-500 text-center py-12">No food items yet. Add one!</p>
       ) : (

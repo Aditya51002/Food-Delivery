@@ -21,7 +21,8 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     try {
       const { data } = await API.get("/orders/admin");
-      setOrders(data);
+      const normalized = Array.isArray(data) ? data : data?.orders || [];
+      setOrders(normalized);
     } catch {
       toast.error("Failed to load orders");
     } finally {
@@ -58,7 +59,6 @@ const AdminOrders = () => {
     <div>
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Orders Management</h1>
 
-      {/* Filter Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         {["All", ...statusOptions].map((status) => (
           <button
@@ -78,7 +78,6 @@ const AdminOrders = () => {
         ))}
       </div>
 
-      {/* Orders */}
       {filteredOrders.length === 0 ? (
         <p className="text-gray-500 text-center py-12">No orders found.</p>
       ) : (

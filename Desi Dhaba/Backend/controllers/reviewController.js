@@ -2,7 +2,6 @@ const Review = require("../models/Review");
 const FoodItem = require("../models/FoodItem");
 const Restaurant = require("../models/Restaurant");
 
-// Helper: recalculate and update rating on target
 const updateTargetRating = async (targetType, targetId) => {
   const agg = await Review.aggregate([
     { $match: { targetType, targetId: targetId } },
@@ -18,7 +17,6 @@ const updateTargetRating = async (targetType, targetId) => {
   }
 };
 
-// ─── Create Review ────────────────────────────────────────────────────────────
 const createReview = async (req, res) => {
   try {
     const { targetType, targetId, rating, title, comment, orderId } = req.body;
@@ -27,7 +25,6 @@ const createReview = async (req, res) => {
       return res.status(400).json({ message: "targetType, targetId, and rating are required" });
     }
 
-    // Prevent duplicate review per user per target
     const existing = await Review.findOne({ userId: req.user._id, targetType, targetId });
     if (existing) {
       return res.status(400).json({ message: "You have already reviewed this item" });
@@ -52,7 +49,6 @@ const createReview = async (req, res) => {
   }
 };
 
-// ─── Get Reviews for a Target ─────────────────────────────────────────────────
 const getReviews = async (req, res) => {
   try {
     const { targetType, targetId } = req.params;
@@ -73,13 +69,11 @@ const getReviews = async (req, res) => {
   }
 };
 
-// ─── Delete Review ────────────────────────────────────────────────────────────
 const deleteReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
     if (!review) return res.status(404).json({ message: "Review not found" });
 
-    // Allow owner or admin to delete
     if (review.userId.toString() !== req.user._id.toString() && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not authorized to delete this review" });
     }

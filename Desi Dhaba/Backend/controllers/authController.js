@@ -6,7 +6,6 @@ const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
-// ─── Register ────────────────────────────────────────────────────────────────
 const register = async (req, res) => {
   try {
     const { name, email, password, phone, role } = req.body;
@@ -51,7 +50,6 @@ const register = async (req, res) => {
   }
 };
 
-// ─── Login ────────────────────────────────────────────────────────────────────
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -91,7 +89,6 @@ const login = async (req, res) => {
   }
 };
 
-// ─── Get Profile ─────────────────────────────────────────────────────────────
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
@@ -102,7 +99,6 @@ const getMe = async (req, res) => {
   }
 };
 
-// ─── Update Profile ───────────────────────────────────────────────────────────
 const updateProfile = async (req, res) => {
   try {
     const { name, phone } = req.body;
@@ -121,7 +117,6 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// ─── Change Password ─────────────────────────────────────────────────────────
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -149,7 +144,6 @@ const changePassword = async (req, res) => {
   }
 };
 
-// ─── Saved Addresses ─────────────────────────────────────────────────────────
 const addAddress = async (req, res) => {
   try {
     const { label, address, isDefault } = req.body;
@@ -180,7 +174,6 @@ const deleteAddress = async (req, res) => {
   }
 };
 
-// ─── Admin: Get All Users ─────────────────────────────────────────────────────
 const getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;

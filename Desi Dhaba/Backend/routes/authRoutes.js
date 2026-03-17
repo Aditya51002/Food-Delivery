@@ -15,7 +15,6 @@ router.put("/change-password", protect, changePassword);
 router.post("/addresses", protect, addAddress);
 router.delete("/addresses/:addressId", protect, deleteAddress);
 
-// Admin
 router.get("/users", protect, adminOnly, getAllUsers);
 
 module.exports = router;

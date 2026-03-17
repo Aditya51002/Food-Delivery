@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import API from "../utils/api";
 import { useCart } from "../context/CartContext";
@@ -15,9 +15,6 @@ import {
   MdOutlineRestaurant,
 } from "react-icons/md";
 
-/* -----------------------------------------------
-   CATEGORY META  (icon component instead of emoji)
------------------------------------------------ */
 const CATEGORY_META = {
   Pizza:       { Icon: MdOutlineLocalPizza,    color: "bg-red-100 text-red-700",    iconColor: "#b91c1c" },
   Burgers:     { Icon: MdOutlineFastfood,       color: "bg-yellow-100 text-yellow-700", iconColor: "#b45309" },
@@ -28,9 +25,6 @@ const CATEGORY_META = {
 };
 const DEFAULT_META = { Icon: MdOutlineRestaurant, color: "bg-gray-100 text-gray-700", iconColor: "#6b7280" };
 
-/* -----------------------------------------------
-   CRAVE COMPASS MOODS  (icon component per mood)
------------------------------------------------ */
 const MOODS = [
   {
     id: "spicy",
@@ -88,7 +82,6 @@ const MOODS = [
   },
 ];
 
-/* ── Star Rating ─────────────────────────────── */
 const StarRating = ({ rating, count }) => (
   <div className="flex items-center space-x-0.5">
     {[1,2,3,4,5].map((i) => (
@@ -100,7 +93,6 @@ const StarRating = ({ rating, count }) => (
   </div>
 );
 
-/* ── Restaurant Card ─────────────────────────── */
 const RestaurantCard = ({ restaurant }) => (
   <Link
     to={`/restaurant/${restaurant._id}`}
@@ -139,7 +131,6 @@ const RestaurantCard = ({ restaurant }) => (
   </Link>
 );
 
-/* ── Skeleton Card ───────────────────────────── */
 const SkeletonCard = () => (
   <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
     <div className="h-44 bg-gray-200" />
@@ -151,7 +142,6 @@ const SkeletonCard = () => (
   </div>
 );
 
-/* ── Food Card ───────────────────────────────── */
 const FoodCard = ({ food, onAddToCart, addingId }) => {
   const meta = CATEGORY_META[food.category] || DEFAULT_META;
   const { Icon: CatIcon, iconColor } = meta;
@@ -163,14 +153,12 @@ const FoodCard = ({ food, onAddToCart, addingId }) => {
         ) : (
           <CatIcon size={72} color={iconColor} className="opacity-50" />
         )}
-        {/* Top badges */}
         <div className="absolute top-2.5 left-2.5 flex flex-col space-y-1">
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${meta.color}`}>{food.category}</span>
           {food.isBestSeller && (
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-yellow-900">🏆 Best Seller</span>
           )}
         </div>
-        {/* Veg / Non-Veg dot */}
         <div className="absolute top-2.5 right-2.5">
           <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${food.isVeg !== false ? "border-green-600" : "border-red-600"}`}>
             <div className={`w-2.5 h-2.5 rounded-full ${food.isVeg !== false ? "bg-green-600" : "bg-red-600"}`} />
@@ -209,9 +197,6 @@ const FoodCard = ({ food, onAddToCart, addingId }) => {
   );
 };
 
-/* -----------------------------------------------
-   CRAVE COMPASS COMPONENT
------------------------------------------------ */
 const CraveCompass = ({ activeMood, onMoodSelect }) => {
   return (
     <section
@@ -228,7 +213,6 @@ const CraveCompass = ({ activeMood, onMoodSelect }) => {
       />
 
       <div className="relative z-10 px-6 py-8 md:px-10">
-        {/* Header */}
         <div className="flex items-center space-x-3 mb-2">
           <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
             <FiZap size={18} className="text-yellow-300" />
@@ -247,7 +231,6 @@ const CraveCompass = ({ activeMood, onMoodSelect }) => {
           )}
         </div>
 
-        {/* Mood Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-5">
           {MOODS.map((mood) => {
             const isActive = activeMood?.id === mood.id;
@@ -286,7 +269,6 @@ const CraveCompass = ({ activeMood, onMoodSelect }) => {
                 {isActive && (
                   <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-white animate-ping opacity-60" />
                 )}
-                {/* Icon instead of emoji */}
                 <div className="mb-2 transition-transform duration-200 group-hover:scale-125">
                   <MoodIcon
                     size={32}
@@ -305,7 +287,6 @@ const CraveCompass = ({ activeMood, onMoodSelect }) => {
           })}
         </div>
 
-        {/* Active mood tag */}
         {activeMood && (
           <div
             className="mt-4 inline-flex items-center space-x-2 rounded-full px-4 py-1.5"
@@ -325,7 +306,6 @@ const CraveCompass = ({ activeMood, onMoodSelect }) => {
   );
 };
 
-/* ── HOME PAGE ───────────────────────────────── */
 const Home = () => {
   const { user } = useAuth();
   const { incrementItem } = useCart();
@@ -402,7 +382,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ── Hero ── */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #c2410c 0%, #ea580c 40%, #f97316 70%, #fb923c 100%)" }}>
         <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-white/10" />
         <div className="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-white/10" />
@@ -446,7 +425,6 @@ const Home = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-8">
-        {/* ── Tab Toggle ── */}
         <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-xl w-fit mb-8">
           {[{ key: "food", label: "🍛  Food Menu" }, { key: "restaurants", label: "🏪  Restaurants" }].map((tab) => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
@@ -472,7 +450,6 @@ const Home = () => {
           </div>
         ) : (
           <>
-            {/* ── Restaurants Tab ── */}
             {activeTab === "restaurants" && (
               <>
                 <div className="flex items-center justify-between mb-5">
@@ -494,7 +471,6 @@ const Home = () => {
               </>
             )}
 
-            {/* ── Food Tab ── */}
             {activeTab === "food" && (
               <>
                 <CraveCompass activeMood={activeMood} onMoodSelect={handleMoodSelect} />

@@ -3,7 +3,6 @@ const User = require("../models/User");
 const Restaurant = require("../models/Restaurant");
 const FoodItem = require("../models/FoodItem");
 
-// ─── Get Dashboard Overview ────────────────────────────────────────────────────
 const getDashboardStats = async (req, res) => {
   try {
     const [totalOrders, totalUsers, totalRestaurants, totalFoods, deliveredOrders, pendingOrders] =
@@ -16,14 +15,12 @@ const getDashboardStats = async (req, res) => {
         Order.countDocuments({ status: "Pending" }),
       ]);
 
-    // Total revenue (from delivered orders only)
     const revenueAgg = await Order.aggregate([
       { $match: { status: "Delivered" } },
       { $group: { _id: null, total: { $sum: "$totalAmount" } } },
     ]);
     const totalRevenue = revenueAgg[0]?.total || 0;
 
-    // Today's stats
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayOrders = await Order.countDocuments({ createdAt: { $gte: today } });
@@ -49,7 +46,6 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
-// ─── Revenue Chart (last 7 days) ─────────────────────────────────────────────
 const getRevenueChart = async (req, res) => {
   try {
     const days = parseInt(req.query.days) || 7;
@@ -73,7 +69,6 @@ const getRevenueChart = async (req, res) => {
       { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
     ]);
 
-    // Fill in missing days with 0
     const chartData = [];
     for (let i = 0; i < days; i++) {
       const d = new Date();
@@ -94,7 +89,6 @@ const getRevenueChart = async (req, res) => {
   }
 };
 
-// ─── Order Status Distribution ────────────────────────────────────────────────
 const getOrderStatusDistribution = async (req, res) => {
   try {
     const data = await Order.aggregate([
@@ -107,7 +101,6 @@ const getOrderStatusDistribution = async (req, res) => {
   }
 };
 
-// ─── Top Selling Items ────────────────────────────────────────────────────────
 const getTopItems = async (req, res) => {
   try {
     const data = await Order.aggregate([

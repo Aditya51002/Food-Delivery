@@ -17,7 +17,6 @@ const EMPTY_FORM = {
   rating: "4.0", isAvailable: true,
 };
 
-/* ── Star display ─────────────────────────────────────── */
 const Stars = ({ v }) => (
   <span className="flex items-center space-x-0.5 text-yellow-400 text-sm">
     {[1, 2, 3, 4, 5].map((i) => (
@@ -27,7 +26,6 @@ const Stars = ({ v }) => (
   </span>
 );
 
-/* ── Main component ────────────────────────────────────── */
 const AdminFoodsGlobal = () => {
   const [foods, setFoods] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,10 +37,8 @@ const AdminFoodsGlobal = () => {
   const [imageFile, setImageFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  /* ── Data fetching ─────────────────────────────────── */
   const fetchFoods = async () => {
     try {
-      // Admin needs all foods (including unavailable), so fetch without isAvailable filter
       const { data } = await API.get("/foods");
       setFoods(data);
     } catch {
@@ -56,7 +52,6 @@ const AdminFoodsGlobal = () => {
     fetchFoods();
   }, []);
 
-  /* ── Form helpers ──────────────────────────────────── */
   const openAdd = () => {
     setForm(EMPTY_FORM);
     setImageFile(null);
@@ -85,7 +80,6 @@ const AdminFoodsGlobal = () => {
     setImageFile(null);
   };
 
-  /* ── Submit (create / update) ──────────────────────── */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.price || !form.category) {
@@ -123,7 +117,6 @@ const AdminFoodsGlobal = () => {
     }
   };
 
-  /* ── Delete ────────────────────────────────────────── */
   const handleDelete = async (id, name) => {
     if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
     try {
@@ -135,7 +128,6 @@ const AdminFoodsGlobal = () => {
     }
   };
 
-  /* ── Derived filtered list ─────────────────────────── */
   const visible = foods.filter((f) => {
     const matchCat = filterCat === "All" || f.category === filterCat;
     const matchSearch =
@@ -151,7 +143,6 @@ const AdminFoodsGlobal = () => {
     categories: [...new Set(foods.map((f) => f.category))].length,
   };
 
-  /* ── Render ────────────────────────────────────────── */
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -162,7 +153,6 @@ const AdminFoodsGlobal = () => {
 
   return (
     <div>
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Food Items</h1>
@@ -177,7 +167,6 @@ const AdminFoodsGlobal = () => {
         </button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[
           { label: "Total Items", value: stats.total, color: "text-orange-600" },
@@ -191,9 +180,7 @@ const AdminFoodsGlobal = () => {
         ))}
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        {/* Search */}
         <div className="relative flex-1">
           <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
           <input
@@ -204,7 +191,6 @@ const AdminFoodsGlobal = () => {
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
         </div>
-        {/* Category filter */}
         <select
           value={filterCat}
           onChange={(e) => setFilterCat(e.target.value)}
@@ -219,7 +205,6 @@ const AdminFoodsGlobal = () => {
         </select>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         {visible.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
@@ -312,11 +297,9 @@ const AdminFoodsGlobal = () => {
         )}
       </div>
 
-      {/* ── Add / Edit Modal ──────────────────────────────── */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            {/* Modal header */}
             <div className="flex items-center justify-between px-6 py-4 border-b">
               <h2 className="text-lg font-bold text-gray-800">
                 {editId ? "Edit Food Item" : "Add New Food Item"}
@@ -326,9 +309,7 @@ const AdminFoodsGlobal = () => {
               </button>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Name <span className="text-red-500">*</span>
@@ -343,7 +324,6 @@ const AdminFoodsGlobal = () => {
                 />
               </div>
 
-              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
@@ -357,7 +337,6 @@ const AdminFoodsGlobal = () => {
                 />
               </div>
 
-              {/* Price + Category row */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -393,7 +372,6 @@ const AdminFoodsGlobal = () => {
                 </div>
               </div>
 
-              {/* Rating + Availability row */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -428,7 +406,6 @@ const AdminFoodsGlobal = () => {
                 </div>
               </div>
 
-              {/* Image upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Image (optional)
@@ -441,7 +418,6 @@ const AdminFoodsGlobal = () => {
                 />
               </div>
 
-              {/* Buttons */}
               <div className="flex space-x-3 pt-2">
                 <button
                   type="button"

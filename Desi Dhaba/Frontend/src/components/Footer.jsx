@@ -8,7 +8,6 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
 
-          {/* Brand */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="bg-orange-600 p-1.5 rounded-xl">
@@ -32,7 +31,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h3 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase">Quick Links</h3>
             <ul className="space-y-2.5 text-sm">
@@ -51,7 +49,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Legal */}
           <div>
             <h3 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase">Legal</h3>
             <ul className="space-y-2.5 text-sm">
@@ -68,7 +65,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
             <h3 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase">Contact Us</h3>
             <ul className="space-y-3 text-sm">
@@ -88,7 +84,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom strip */}
         <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
           <p className="text-xs text-gray-500">
             © {new Date().getFullYear()} Desi Dhaba. All rights reserved.

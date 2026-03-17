@@ -11,13 +11,10 @@ dotenv.config();
 
 const app = express();
 
-// Connect Database
 connectDB();
 
-// ─── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
-// Rate limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 200,
@@ -35,7 +32,6 @@ app.use("/api/", apiLimiter);
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 
-// ─── Core Middleware ──────────────────────────────────────────────────────────
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -50,7 +46,6 @@ if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/restaurants", require("./routes/restaurantRoutes"));
 app.use("/api/foods", require("./routes/foodRoutes"));
@@ -60,7 +55,6 @@ app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/coupons", require("./routes/couponRoutes"));
 app.use("/api/analytics", require("./routes/analyticsRoutes"));
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
@@ -70,12 +64,10 @@ app.get("/", (req, res) => {
   });
 });
 
-// ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ message: `Route ${req.originalUrl} not found` });
 });
 
-// ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(`[ERROR] ${err.stack}`);
   const statusCode = err.statusCode || 500;

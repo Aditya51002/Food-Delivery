@@ -33,7 +33,6 @@ const AdminLayout = ({ children }) => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform transition-transform duration-200 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -77,9 +76,7 @@ const AdminLayout = ({ children }) => {
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
         <header className="bg-white shadow-sm h-16 flex items-center px-6">
           <button className="md:hidden mr-4 text-gray-600" onClick={() => setSidebarOpen(true)}>
             <FiMenu size={22} />
@@ -87,11 +84,9 @@ const AdminLayout = ({ children }) => {
           <h1 className="text-lg font-semibold text-gray-800">Desi Dhaba Admin</h1>
         </header>
 
-        {/* Content */}
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
 
-      {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"

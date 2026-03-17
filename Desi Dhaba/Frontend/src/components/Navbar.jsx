@@ -35,7 +35,6 @@ const Navbar = () => {
     }
   };
 
-  // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
@@ -45,7 +44,6 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const navLink = "hover:text-orange-200 transition font-medium text-sm";
@@ -55,7 +53,6 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
             <div className="bg-white/20 backdrop-blur-sm p-1.5 rounded-xl">
               <MdOutlineRiceBowl size={22} className="text-yellow-300" />
@@ -68,11 +65,9 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-5">
             <Link to="/" className={navLink}>Home</Link>
 
-            {/* Search */}
             <div ref={searchRef} className="relative">
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
@@ -118,7 +113,6 @@ const Navbar = () => {
                   )}
                 </Link>
 
-                {/* Profile Dropdown */}
                 <div ref={profileRef} className="relative ml-1">
                   <button
                     onClick={() => setProfileOpen(!profileOpen)}
@@ -199,7 +193,6 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile: cart + hamburger */}
           <div className="md:hidden flex items-center space-x-3">
             {user && (
               <Link to="/cart" className="relative">
@@ -217,10 +210,8 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {mobileOpen && (
           <div className="md:hidden pb-4 pt-2 border-t border-orange-500/40 space-y-1">
-            {/* Mobile Search */}
             <form onSubmit={handleSearch} className="flex mb-3">
               <input
                 value={searchQuery}

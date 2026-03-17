@@ -44,7 +44,6 @@ const AdminDashboard = () => {
     <div>
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
 
-      {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((stat) => (
           <div key={stat.label} className="bg-white rounded-xl shadow-md p-5 flex items-center space-x-4">
@@ -57,7 +56,6 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/* Recent Orders */}
       <div className="bg-white rounded-xl shadow-md p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Orders</h2>
         {recentOrders.length === 0 ? (

@@ -32,15 +32,12 @@ export const CartProvider = ({ children }) => {
     }
   }, [user]);
 
-  // addToCart: sets the item to an explicit quantity (used by Cart page +/- controls)
   const addToCart = async (foodId, quantity) => {
     const { data } = await API.post("/cart/add", { foodId, quantity });
     setCart(data);
     return data;
   };
 
-  // incrementItem: no quantity sent → backend does currentQty + 1 naturally
-  // Use this from Home / RestaurantMenu "Add" buttons to avoid resetting qty to 1
   const incrementItem = async (foodId) => {
     const { data } = await API.post("/cart/add", { foodId });
     setCart(data);

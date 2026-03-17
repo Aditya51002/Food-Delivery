@@ -2,7 +2,6 @@ const Restaurant = require("../models/Restaurant");
 const FoodItem = require("../models/FoodItem");
 const { cloudinary } = require("../config/cloudinary");
 
-// ─── Create Restaurant ────────────────────────────────────────────────────────
 const createRestaurant = async (req, res) => {
   try {
     const { name, description, address, isActive, isOpen, cuisine, tags,
@@ -31,7 +30,6 @@ const createRestaurant = async (req, res) => {
   }
 };
 
-// ─── Get Restaurants ──────────────────────────────────────────────────────────
 const getRestaurants = async (req, res) => {
   try {
     const { search, cuisine, isOpen, page = 1, limit = 20 } = req.query;
@@ -60,7 +58,6 @@ const getRestaurants = async (req, res) => {
   }
 };
 
-// ─── Get Single Restaurant ────────────────────────────────────────────────────
 const getRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);
@@ -73,7 +70,6 @@ const getRestaurant = async (req, res) => {
   }
 };
 
-// ─── Update Restaurant ────────────────────────────────────────────────────────
 const updateRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);
@@ -113,7 +109,6 @@ const updateRestaurant = async (req, res) => {
   }
 };
 
-// ─── Delete Restaurant ────────────────────────────────────────────────────────
 const deleteRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);

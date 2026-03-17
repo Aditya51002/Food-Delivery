@@ -53,7 +53,6 @@ const Checkout = () => {
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Checkout</h1>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Order Summary */}
         <div className="bg-white rounded-xl shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Order Summary</h2>
           <div className="space-y-3">
@@ -76,7 +75,6 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* Delivery Details */}
         <form onSubmit={handlePlaceOrder} className="bg-white rounded-xl shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Delivery Details</h2>
 

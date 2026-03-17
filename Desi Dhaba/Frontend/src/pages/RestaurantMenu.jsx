@@ -9,7 +9,6 @@ import {
 } from "react-icons/fi";
 import { MdOutlineRestaurant, MdLocalFireDepartment } from "react-icons/md";
 
-/* ── Spicy Meter ─────────────────────────────── */
 const SPICY_LEVELS = { mild: 1, medium: 2, hot: 3, "extra-hot": 4 };
 const SpicyMeter = ({ level }) => {
   const count = SPICY_LEVELS[level] || 0;
@@ -23,7 +22,6 @@ const SpicyMeter = ({ level }) => {
   );
 };
 
-/* ── Star Rating ─────────────────────────────── */
 const StarRating = ({ rating }) => (
   <div className="flex items-center space-x-0.5">
     {[1, 2, 3, 4, 5].map((i) => (
@@ -37,7 +35,6 @@ const StarRating = ({ rating }) => (
   </div>
 );
 
-/* ── Food Card ───────────────────────────────── */
 const FoodCard = ({ food, cartQty, onIncrement, onDecrement, addingId }) => {
   const isAdding = addingId === food._id;
   const hasDiscount = food.originalPrice && food.originalPrice > food.price;
@@ -47,7 +44,6 @@ const FoodCard = ({ food, cartQty, onIncrement, onDecrement, addingId }) => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col group">
-      {/* Image */}
       <div className="h-44 bg-gradient-to-br from-orange-50 to-amber-50 overflow-hidden relative flex-shrink-0">
         {food.image ? (
           <img
@@ -70,7 +66,6 @@ const FoodCard = ({ food, cartQty, onIncrement, onDecrement, addingId }) => {
             {discountPct}% OFF
           </div>
         )}
-        {/* Veg / Non-Veg indicator */}
         <div className="absolute top-2.5 right-2.5">
           <div
             className={`w-5 h-5 rounded border-2 flex items-center justify-center bg-white/90 backdrop-blur-sm ${
@@ -86,7 +81,6 @@ const FoodCard = ({ food, cartQty, onIncrement, onDecrement, addingId }) => {
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-3.5 flex flex-col flex-1">
         <h3 className="font-bold text-gray-800 text-sm leading-tight line-clamp-1 mb-0.5">
           {food.name}
@@ -101,7 +95,6 @@ const FoodCard = ({ food, cartQty, onIncrement, onDecrement, addingId }) => {
           <SpicyMeter level={food.spicyLevel} />
         </div>
 
-        {/* Meta chips */}
         <div className="flex flex-wrap gap-1 mb-3">
           {food.preparationTime && (
             <span className="flex items-center gap-0.5 bg-gray-50 rounded-full px-2 py-0.5 text-[10px] text-gray-500 border border-gray-100">
@@ -116,7 +109,6 @@ const FoodCard = ({ food, cartQty, onIncrement, onDecrement, addingId }) => {
           )}
         </div>
 
-        {/* Price + Add/Counter button */}
         <div className="flex items-center justify-between mt-auto">
           <div>
             <span className="text-lg font-extrabold text-orange-600">₹{food.price}</span>
@@ -165,7 +157,6 @@ const FoodCard = ({ food, cartQty, onIncrement, onDecrement, addingId }) => {
   );
 };
 
-/* ── Category Tabs ───────────────────────────── */
 const CategoryTabs = ({ categories, active, onSelect }) => (
   <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [&::-webkit-scrollbar]:hidden">
     {categories.map((cat) => (
@@ -184,7 +175,6 @@ const CategoryTabs = ({ categories, active, onSelect }) => (
   </div>
 );
 
-/* ── Skeleton ────────────────────────────────── */
 const MenuSkeleton = () => (
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 animate-pulse">
     <div className="h-8 bg-gray-200 rounded w-1/3" />
@@ -196,7 +186,6 @@ const MenuSkeleton = () => (
   </div>
 );
 
-/* ── Main Component ──────────────────────────── */
 const RestaurantMenu = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -281,7 +270,6 @@ const RestaurantMenu = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen pb-28">
-      {/* ── Cinematic Hero Banner ───────────────── */}
       <div className="relative h-52 md:h-72 overflow-hidden">
         {restaurant.image ? (
           <>
@@ -324,7 +312,6 @@ const RestaurantMenu = () => {
         </div>
       </div>
 
-      {/* ── Sticky Category Pill Tabs ────────────── */}
       <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <CategoryTabs
@@ -335,14 +322,12 @@ const RestaurantMenu = () => {
         </div>
       </div>
 
-      {/* ── Menu Sections ────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
         {categories.length === 0 ? (
           <p className="text-gray-500 text-center py-12">No menu items available.</p>
         ) : (
           categories.map((cat) => (
             <div key={cat} ref={(el) => (categoryRefs.current[cat] = el)}>
-              {/* Section header */}
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-xl font-extrabold text-gray-800">{cat}</h2>
                 <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2.5 py-0.5 font-semibold">
@@ -367,7 +352,6 @@ const RestaurantMenu = () => {
         )}
       </div>
 
-      {/* ── Floating View Cart Bar ───────────────── */}
       {cartCount > 0 && (
         <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50">
           <button

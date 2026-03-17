@@ -5,7 +5,6 @@ const Coupon = require("../models/Coupon");
 const TAX_RATE = 0.05; // 5% GST
 const DELIVERY_FEE_BASE = 30;
 
-// ─── Place Order ──────────────────────────────────────────────────────────────
 const placeOrder = async (req, res) => {
   try {
     const { deliveryAddress, paymentMethod, orderNote, couponCode } = req.body;
@@ -34,7 +33,6 @@ const placeOrder = async (req, res) => {
     const deliveryFee = subtotal >= 500 ? 0 : DELIVERY_FEE_BASE;
     const taxAmount = Math.round(subtotal * TAX_RATE);
 
-    // Coupon handling
     let discount = 0;
     let appliedCouponCode = "";
     if (couponCode && couponCode.trim()) {
@@ -54,7 +52,6 @@ const placeOrder = async (req, res) => {
               }
               discount = Math.round(Math.min(discount, subtotal));
               appliedCouponCode = coupon.code;
-              // Track usage
               coupon.usedBy.push({ userId: req.user._id });
               coupon.usedCount += 1;
               await coupon.save();
@@ -95,7 +92,6 @@ const placeOrder = async (req, res) => {
   }
 };
 
-// ─── Get User Orders ──────────────────────────────────────────────────────────
 const getUserOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -114,13 +110,11 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-// ─── Get Single Order ─────────────────────────────────────────────────────────
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate("userId", "name email phone");
     if (!order) return res.status(404).json({ message: "Order not found" });
 
-    // Only owner or admin can view
     if (order.userId._id.toString() !== req.user._id.toString() && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -130,7 +124,6 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// ─── Cancel Order (User) ──────────────────────────────────────────────────────
 const cancelOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -154,7 +147,6 @@ const cancelOrder = async (req, res) => {
   }
 };
 
-// ─── Admin: Get All Orders ────────────────────────────────────────────────────
 const getAllOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -178,7 +170,6 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-// ─── Admin: Update Order Status ───────────────────────────────────────────────
 const updateOrderStatus = async (req, res) => {
   try {
     const { status, note } = req.body;
@@ -206,7 +197,6 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-// ─── Reorder: Merge Past Order Items into Cart ───────────────────────────────
 const reorder = async (req, res) => {
   try {
     const FoodItem = require("../models/FoodItem");
@@ -236,7 +226,6 @@ const reorder = async (req, res) => {
       return res.status(400).json({ message: "No available items from this order to reorder" });
     }
 
-    // Recalculate total
     let total = 0;
     for (const cartItem of cart.items) {
       const food = await FoodItem.findById(cartItem.foodId);

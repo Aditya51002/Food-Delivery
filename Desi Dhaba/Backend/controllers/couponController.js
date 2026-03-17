@@ -1,6 +1,5 @@
 const Coupon = require("../models/Coupon");
 
-// ─── Validate / Apply a Coupon ────────────────────────────────────────────────
 const validateCoupon = async (req, res) => {
   try {
     const { code, orderAmount } = req.body;
@@ -23,7 +22,6 @@ const validateCoupon = async (req, res) => {
       });
     }
 
-    // Per-user usage check
     const userUsageCount = coupon.usedBy.filter(
       (u) => u.userId.toString() === req.user._id.toString()
     ).length;
@@ -31,7 +29,6 @@ const validateCoupon = async (req, res) => {
       return res.status(400).json({ message: "You have already used this coupon" });
     }
 
-    // Calculate discount
     let discount = 0;
     if (coupon.discountType === "percentage") {
       discount = (orderAmount * coupon.discountValue) / 100;
@@ -57,7 +54,6 @@ const validateCoupon = async (req, res) => {
   }
 };
 
-// ─── Admin: Get All Coupons ───────────────────────────────────────────────────
 const getAllCoupons = async (req, res) => {
   try {
     const coupons = await Coupon.find().sort({ createdAt: -1 });
@@ -67,7 +63,6 @@ const getAllCoupons = async (req, res) => {
   }
 };
 
-// ─── Admin: Create Coupon ─────────────────────────────────────────────────────
 const createCoupon = async (req, res) => {
   try {
     const { code, description, discountType, discountValue, maxDiscount, minOrderAmount,
@@ -100,7 +95,6 @@ const createCoupon = async (req, res) => {
   }
 };
 
-// ─── Admin: Update Coupon ─────────────────────────────────────────────────────
 const updateCoupon = async (req, res) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
@@ -119,7 +113,6 @@ const updateCoupon = async (req, res) => {
   }
 };
 
-// ─── Admin: Delete Coupon ─────────────────────────────────────────────────────
 const deleteCoupon = async (req, res) => {
   try {
     const coupon = await Coupon.findByIdAndDelete(req.params.id);

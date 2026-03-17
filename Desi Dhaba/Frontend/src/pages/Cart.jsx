@@ -110,7 +110,6 @@ const Cart = () => {
         })}
       </div>
 
-      {/* Total & Checkout */}
       <div className="bg-white rounded-xl shadow-md p-6 mt-6">
         <div className="flex justify-between items-center text-xl font-bold text-gray-800 mb-4">
           <span>Total</span>
