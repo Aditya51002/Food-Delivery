@@ -1,22 +1,21 @@
 const router = require("express").Router();
 const {
-  createRestaurant, getRestaurants, getRestaurant,
-  updateRestaurant, deleteRestaurant,
+  createRestaurant,
+  getRestaurants,
+  getRestaurant,
+  updateRestaurant,
+  deleteRestaurant,
 } = require("../controllers/restaurantController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
-const { upload } = require("../config/cloudinary");
-const validate = require("../middleware/validate");
-const { restaurantValidators } = require("../middleware/validators/restaurantValidators");
+const multer = require("multer");
+const { storage } = require("../config/cloudinary");
+const upload = multer({ storage });
 
-router
-  .route("/")
-  .get(getRestaurants)
-  .post(protect, adminOnly, upload.single("image"), restaurantValidators, validate, createRestaurant);
+router.get("/", getRestaurants);
+router.get("/:id", getRestaurant);
 
-router
-  .route("/:id")
-  .get(getRestaurant)
-  .put(protect, adminOnly, upload.single("image"), restaurantValidators, validate, updateRestaurant)
-  .delete(protect, adminOnly, deleteRestaurant);
+router.post("/", protect, adminOnly, upload.single("image"), createRestaurant);
+router.put("/:id", protect, adminOnly, upload.single("image"), updateRestaurant);
+router.delete("/:id", protect, adminOnly, deleteRestaurant);
 
 module.exports = router;

@@ -1,10 +1,5 @@
 const { validationResult } = require("express-validator");
 
-/**
- * Central validation error handler.
- * Place this AFTER express-validator check() chains in any route.
- * Returns 422 with array of field errors if validation fails.
- */
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

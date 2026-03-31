@@ -124,7 +124,7 @@ const OrderDetail = () => {
         <div className="flex-1 space-y-8">
           
           <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 blur-[100px] rounded-full pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 blur-[100px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2" />
             
             <h1 className="text-3xl sm:text-4xl font-black text-white mb-2 tracking-tight relative z-10">
               Order <span className="text-rose-500 drop-shadow-md">#{order._id.slice(-8).toUpperCase()}</span>

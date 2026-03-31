@@ -8,19 +8,16 @@ const Profile = () => {
   const { user, fetchUser } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
 
-  // Profile Form
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState(user?.phone || "");
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
   const [loadingProfile, setLoadingProfile] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Password Form
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loadingPassword, setLoadingPassword] = useState(false);
 
-  // Address Form
   const [newAddress, setNewAddress] = useState("");
   const [loadingAddress, setLoadingAddress] = useState(false);
 

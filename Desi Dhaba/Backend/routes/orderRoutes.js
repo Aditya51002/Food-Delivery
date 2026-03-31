@@ -1,22 +1,24 @@
 const router = require("express").Router();
 const {
-  placeOrder, getUserOrders, getOrderById,
-  cancelOrder, getAllOrders, updateOrderStatus, reorder,
+  placeOrder,
+  getUserOrders,
+  getOrderById,
+  cancelOrder,
+  getAllOrders,
+  updateOrderStatus,
+  reorder,
 } = require("../controllers/orderController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
-const validate = require("../middleware/validate");
-const {
-  placeOrderValidators,
-  cancelOrderValidators,
-  updateStatusValidators,
-} = require("../middleware/validators/orderValidators");
 
-router.post("/", protect, placeOrderValidators, validate, placeOrder);
-router.get("/user", protect, getUserOrders);
-router.get("/admin", protect, adminOnly, getAllOrders);
-router.get("/:id", protect, getOrderById);
-router.post("/:id/reorder", protect, reorder);
-router.put("/:id/cancel", protect, cancelOrderValidators, validate, cancelOrder);
-router.put("/:id/status", protect, adminOnly, updateStatusValidators, validate, updateOrderStatus);
+router.use(protect);
+
+router.post("/", placeOrder);
+router.get("/user", getUserOrders);
+router.get("/:id", getOrderById);
+router.post("/:id/cancel", cancelOrder);
+router.post("/:id/reorder", reorder);
+
+router.get("/", adminOnly, getAllOrders);
+router.patch("/:id/status", adminOnly, updateOrderStatus);
 
 module.exports = router;

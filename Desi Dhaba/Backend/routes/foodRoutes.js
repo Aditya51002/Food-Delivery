@@ -1,28 +1,25 @@
 const router = require("express").Router();
 const {
-  getAllFoods, getCategories, createGlobalFoodItem,
-  createFoodItem, getFoodsByRestaurant, updateFoodItem, deleteFoodItem,
+  getAllFoods,
+  getCategories,
+  createFoodItem,
+  getFoodsByRestaurant,
+  updateFoodItem,
+  deleteFoodItem,
+  createGlobalFoodItem,
 } = require("../controllers/foodController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
-const { upload } = require("../config/cloudinary");
-const validate = require("../middleware/validate");
-const { foodItemValidators } = require("../middleware/validators/foodValidators");
+const multer = require("multer");
+const { storage } = require("../config/cloudinary");
+const upload = multer({ storage });
 
-router.route("/").get(getAllFoods);
-router.route("/categories").get(getCategories);
+router.get("/", getAllFoods);
+router.get("/categories", getCategories);
+router.get("/:restaurantId", getFoodsByRestaurant);
 
-router
-  .route("/create")
-  .post(protect, adminOnly, upload.single("image"), foodItemValidators, validate, createGlobalFoodItem);
-
-router
-  .route("/item/:id")
-  .put(protect, adminOnly, upload.single("image"), foodItemValidators, validate, updateFoodItem)
-  .delete(protect, adminOnly, deleteFoodItem);
-
-router
-  .route("/:restaurantId")
-  .get(getFoodsByRestaurant)
-  .post(protect, adminOnly, upload.single("image"), foodItemValidators, validate, createFoodItem);
+router.post("/", protect, adminOnly, upload.single("image"), createGlobalFoodItem);
+router.post("/:restaurantId", protect, adminOnly, upload.single("image"), createFoodItem);
+router.put("/:id", protect, adminOnly, upload.single("image"), updateFoodItem);
+router.delete("/:id", protect, adminOnly, deleteFoodItem);
 
 module.exports = router;

@@ -103,7 +103,6 @@ const Checkout = () => {
     paymentObject.open();
   };
 
-
   if (!cart.items || cart.items.length === 0) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-24 text-center">
@@ -135,7 +134,7 @@ const Checkout = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-widest pl-1">
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest pl-1">
                 Full Address
               </label>
               <textarea
