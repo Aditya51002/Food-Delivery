@@ -17,8 +17,8 @@ const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/admin/login");
   };
 
@@ -32,31 +32,34 @@ const AdminLayout = ({ children }) => {
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + "/");
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-zinc-950">
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform transition-transform duration-200 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-zinc-950 border-r border-white/5 transform transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 md:static md:block`}
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-700">
-          <div className="flex items-center space-x-2">
-            <MdOutlineRiceBowl size={22} className="text-yellow-400" />
-            <span className="text-xl font-bold">Admin Panel</span>
+        <div className="flex items-center justify-between h-16 px-6 border-b border-white/5">
+          <div className="flex items-center space-x-2.5">
+            <div className="bg-gradient-to-br from-rose-500 to-amber-500 p-1.5 rounded-lg shadow-[0_0_12px_rgba(244,63,94,0.3)]">
+              <MdOutlineRiceBowl size={18} className="text-white" />
+            </div>
+            <span className="text-lg font-black text-white tracking-tight">Admin</span>
           </div>
-          <button className="md:hidden text-gray-400" onClick={() => setSidebarOpen(false)}>
+          <button className="md:hidden text-zinc-500 hover:text-white" onClick={() => setSidebarOpen(false)}>
             <FiX size={20} />
           </button>
         </div>
-        <nav className="mt-6 px-4 space-y-1">
+
+        <nav className="mt-6 px-3 space-y-1">
           {links.map((link) => (
             <Link
               key={link.to}
               to={link.to}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
+              className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive(link.to)
-                  ? "bg-orange-600 text-white"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  ? "bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]"
+                  : "text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent"
               }`}
             >
               {link.icon}
@@ -64,11 +67,12 @@ const AdminLayout = ({ children }) => {
             </Link>
           ))}
         </nav>
-        <div className="absolute bottom-0 w-full p-4 border-t border-gray-700">
-          <div className="text-sm text-gray-400 mb-2 px-4">{user?.name}</div>
+
+        <div className="absolute bottom-0 w-full p-4 border-t border-white/5">
+          <div className="text-xs text-zinc-500 mb-3 px-4 font-bold uppercase tracking-widest truncate">{user?.name}</div>
           <button
             onClick={handleLogout}
-            className="flex items-center space-x-2 text-gray-300 hover:text-white px-4 py-2 w-full rounded-lg hover:bg-gray-800 transition"
+            className="flex items-center space-x-2 text-zinc-400 hover:text-red-400 px-4 py-2.5 w-full rounded-xl hover:bg-red-500/10 transition text-sm font-medium"
           >
             <FiLogOut size={16} />
             <span>Logout</span>
@@ -77,19 +81,19 @@ const AdminLayout = ({ children }) => {
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white shadow-sm h-16 flex items-center px-6">
-          <button className="md:hidden mr-4 text-gray-600" onClick={() => setSidebarOpen(true)}>
+        <header className="glass-panel h-16 flex items-center px-6 border-b border-white/5 flex-shrink-0">
+          <button className="md:hidden mr-4 text-zinc-400 hover:text-white" onClick={() => setSidebarOpen(true)}>
             <FiMenu size={22} />
           </button>
-          <h1 className="text-lg font-semibold text-gray-800">Desi Dhaba Admin</h1>
+          <h1 className="text-base font-bold text-white tracking-tight">Desi Dhaba Command Center</h1>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
 
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

@@ -20,8 +20,8 @@ const Navbar = () => {
   const profileRef = useRef(null);
   const searchRef = useRef(null);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setProfileOpen(false);
     navigate("/login");
   };
@@ -46,32 +46,32 @@ const Navbar = () => {
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
-  const navLink = "hover:text-orange-200 transition font-medium text-sm";
+  const navLink = "hover:text-rose-400 text-zinc-300 transition-colors font-medium text-sm";
 
   return (
-    <nav className="bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg sticky top-0 z-50">
+    <nav className="glass-panel sticky top-0 z-50 rounded-b-2xl mx-2 mt-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
-          <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
-            <div className="bg-white/20 backdrop-blur-sm p-1.5 rounded-xl">
-              <MdOutlineRiceBowl size={22} className="text-yellow-300" />
+          <Link to="/" className="flex items-center space-x-3 flex-shrink-0 group">
+            <div className="bg-gradient-to-br from-rose-500 to-rose-700 p-2 rounded-xl shadow-[0_0_15px_rgba(244,63,94,0.3)] group-hover:scale-105 transition-transform duration-300">
+              <MdOutlineRiceBowl size={20} className="text-white" />
             </div>
             <div>
-              <span className="text-xl font-extrabold tracking-tight">Desi Dhaba</span>
-              <span className="hidden sm:block text-[10px] text-orange-200 -mt-1 font-medium tracking-wider">
-                AUTHENTIC INDIAN CUISINE
+              <span className="text-xl font-black tracking-tight text-white">Desi Dhaba</span>
+              <span className="hidden sm:block text-[9px] text-rose-400 font-bold tracking-[0.2em] -mt-1 uppercase">
+                Midnight Gourmet
               </span>
             </div>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-5">
+          <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className={navLink}>Home</Link>
 
             <div ref={searchRef} className="relative">
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="hover:text-orange-200 transition p-1"
+                className="text-zinc-400 hover:text-white transition p-1"
                 aria-label="Search"
               >
                 <FiSearch size={18} />
@@ -79,18 +79,18 @@ const Navbar = () => {
               {searchOpen && (
                 <form
                   onSubmit={handleSearch}
-                  className="absolute right-0 top-9 bg-white rounded-xl shadow-xl overflow-hidden w-72 flex"
+                  className="absolute right-0 top-9 glass-card rounded-2xl overflow-hidden w-72 flex p-1"
                 >
                   <input
                     autoFocus
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search restaurants or food..."
-                    className="flex-1 px-4 py-2.5 text-gray-800 text-sm outline-none"
+                    placeholder="Search exquisite meals..."
+                    className="flex-1 px-4 py-2 bg-transparent text-zinc-100 text-sm outline-none placeholder-zinc-500"
                   />
                   <button
                     type="submit"
-                    className="bg-orange-600 px-4 text-white hover:bg-orange-700 transition"
+                    className="bg-rose-600 px-4 rounded-xl text-white hover:bg-rose-500 transition shadow-md"
                   >
                     <FiSearch size={16} />
                   </button>
@@ -100,64 +100,64 @@ const Navbar = () => {
 
             {user ? (
               <>
-                <Link to="/orders" className={navLink + " flex items-center space-x-1"}>
+                <Link to="/orders" className={`${navLink} flex items-center space-x-1.5 hover:text-white`}>
                   <FiPackage size={15} />
                   <span>Orders</span>
                 </Link>
-                <Link to="/cart" className="relative hover:text-orange-200 transition">
+                <Link to="/cart" className="relative text-zinc-400 hover:text-white transition-colors">
                   <FiShoppingCart size={20} />
                   {cartCount > 0 && (
-                    <span className="absolute -top-2.5 -right-2.5 bg-yellow-400 text-orange-900 text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none">
+                    <span className="absolute -top-2.5 -right-2.5 bg-rose-500 text-white text-[10px] shadow-[0_0_10px_rgba(244,63,94,0.6)] font-black rounded-full w-5 h-5 flex items-center justify-center">
                       {cartCount > 9 ? "9+" : cartCount}
                     </span>
                   )}
                 </Link>
 
-                <div ref={profileRef} className="relative ml-1">
+                <div ref={profileRef} className="relative ml-2">
                   <button
                     onClick={() => setProfileOpen(!profileOpen)}
-                    className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-xl transition"
+                    className="flex items-center space-x-2.5 bg-zinc-800/80 hover:bg-zinc-700/80 border border-white/5 pl-2 pr-3 py-1.5 rounded-full transition-all duration-300"
                   >
                     {user.avatar ? (
-                      <img src={user.avatar} alt="" className="w-6 h-6 rounded-full object-cover" />
+                      <img src={user.avatar} alt="" className="w-6 h-6 rounded-full object-cover shadow-sm ring-1 ring-white/10" />
                     ) : (
-                      <div className="w-6 h-6 rounded-full bg-yellow-400 text-orange-900 flex items-center justify-center text-xs font-bold">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm text-white flex items-center justify-center text-xs font-bold">
                         {user.name?.charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <span className="text-sm font-medium max-w-[100px] truncate">{user.name}</span>
+                    <span className="text-sm font-medium text-zinc-200 max-w-[100px] truncate">{user.name}</span>
                     <FiChevronDown
                       size={14}
-                      className={`transition-transform ${profileOpen ? "rotate-180" : ""}`}
+                      className={`text-zinc-400 transition-transform ${profileOpen ? "rotate-180" : ""}`}
                     />
                   </button>
 
                   {profileOpen && (
-                    <div className="absolute right-0 top-11 bg-white rounded-2xl shadow-2xl border border-gray-100 w-56 py-2 z-50">
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                    <div className="absolute right-0 top-12 glass-card rounded-2xl w-56 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-white/10">
+                        <p className="text-sm font-bold text-white truncate">{user.name}</p>
+                        <p className="text-xs text-zinc-400 truncate">{user.email}</p>
                       </div>
-                      <Link
-                        to="/profile"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition text-sm"
-                      >
-                        <FiUser size={15} />
-                        <span>My Profile</span>
-                      </Link>
-                      <Link
-                        to="/orders"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition text-sm"
-                      >
-                        <FiPackage size={15} />
-                        <span>My Orders</span>
-                      </Link>
-                      <div className="border-t border-gray-100 mt-1 pt-1">
+                      <div className="p-2 space-y-1">
+                        <Link
+                          to="/profile"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-zinc-300 hover:bg-white/5 hover:text-white transition text-sm"
+                        >
+                          <FiUser size={15} className="text-indigo-400" />
+                          <span>My Profile</span>
+                        </Link>
+                        <Link
+                          to="/orders"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-zinc-300 hover:bg-white/5 hover:text-white transition text-sm"
+                        >
+                          <FiPackage size={15} className="text-rose-400" />
+                          <span>My Orders</span>
+                        </Link>
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-3 px-4 py-2.5 text-red-500 hover:bg-red-50 transition text-sm w-full"
+                          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition text-sm w-full mt-1"
                         >
                           <FiLogOut size={15} />
                           <span>Sign Out</span>
@@ -168,88 +168,86 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Link
-                  to="/login"
-                  className="bg-white text-orange-600 px-4 py-1.5 rounded-xl font-semibold text-sm hover:bg-orange-50 transition"
-                >
-                  Login
+              <div className="flex items-center space-x-3">
+                <Link to="/login" className="text-sm font-semibold text-zinc-300 hover:text-white transition">
+                  Log in
                 </Link>
-                <Link
-                  to="/register"
-                  className="border border-white/60 px-4 py-1.5 rounded-xl font-semibold text-sm hover:bg-white/10 transition"
-                >
-                  Register
+                <Link to="/register" className="btn-primary px-5 py-2 text-sm shadow-md">
+                  Sign up
                 </Link>
               </div>
             )}
 
+            <div className="w-px h-5 bg-white/10 mx-2" />
+
             <Link
               to="/admin/login"
-              className="flex items-center space-x-1 text-xs bg-black/20 hover:bg-black/30 px-3 py-1.5 rounded-lg transition"
+              className="flex items-center space-x-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition"
+              title="Admin Portal"
             >
-              <FiSettings size={12} />
-              <span>Admin</span>
+              <FiSettings size={14} />
             </Link>
           </div>
 
-          <div className="md:hidden flex items-center space-x-3">
+          {/* Mobile hamburger */}
+          <div className="md:hidden flex items-center space-x-4">
             {user && (
-              <Link to="/cart" className="relative">
+              <Link to="/cart" className="relative text-zinc-300">
                 <FiShoppingCart size={22} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-yellow-400 text-orange-900 text-[10px] font-bold rounded-full w-4.5 h-4.5 w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 bg-rose-500 text-white shadow-lg text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartCount > 9 ? "9+" : cartCount}
                   </span>
                 )}
               </Link>
             )}
-            <button onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle menu">
-              {mobileOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="text-zinc-300 hover:text-white">
+              {mobileOpen ? <FiX size={26} /> : <FiMenu size={26} />}
             </button>
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden pb-4 pt-2 border-t border-orange-500/40 space-y-1">
-            <form onSubmit={handleSearch} className="flex mb-3">
+          <div className="md:hidden pb-5 pt-3 border-t border-white/10 space-y-2 animate-in slide-in-from-top-4 duration-300">
+            <form onSubmit={handleSearch} className="flex mb-4 relative">
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search restaurants or food..."
-                className="flex-1 px-3 py-2 rounded-l-lg text-gray-800 text-sm outline-none"
+                placeholder="Search..."
+                className="w-full glass-input pr-12"
               />
-              <button type="submit" className="bg-orange-800 px-3 rounded-r-lg hover:bg-orange-900">
+              <button type="submit" className="absolute right-2 top-1.5 bottom-1.5 px-3 bg-zinc-700/50 rounded-lg text-white">
                 <FiSearch size={16} />
               </button>
             </form>
 
-            <Link to="/" className="flex items-center space-x-2 py-2.5 px-2 rounded-lg hover:bg-white/10">
-              <span>Home</span>
-            </Link>
+            <Link to="/" className="block text-zinc-300 py-2 px-3 rounded-xl hover:bg-white/5 font-medium">Home</Link>
+            
             {user ? (
-              <>
-                <div className="px-2 py-1.5 text-orange-200 text-xs font-semibold tracking-wide border-b border-orange-500/40">
-                  Hi, {user.name} 👋
+              <div className="bg-zinc-800/40 rounded-2xl p-2 mt-4 border border-white/5">
+                <div className="px-3 py-2 text-rose-400 text-xs font-bold uppercase tracking-wider mb-1 opacity-80">
+                  Account Menu
                 </div>
-                <Link to="/profile" className="block py-2.5 px-2 rounded-lg hover:bg-white/10">My Profile</Link>
-                <Link to="/orders" className="block py-2.5 px-2 rounded-lg hover:bg-white/10">My Orders</Link>
-                <Link to="/cart" className="block py-2.5 px-2 rounded-lg hover:bg-white/10">
-                  Cart {cartCount > 0 && <span className="ml-1 bg-yellow-400 text-orange-900 text-xs px-1.5 py-0.5 rounded-full font-bold">{cartCount}</span>}
+                <Link to="/profile" className="flex items-center gap-3 py-2.5 px-3 rounded-xl text-zinc-300 hover:bg-white/5">
+                  <FiUser className="text-indigo-400" /> Profile
                 </Link>
-                <button onClick={handleLogout} className="block py-2.5 px-2 rounded-lg hover:bg-white/10 text-left text-red-300 w-full">
-                  Sign Out
+                <Link to="/orders" className="flex items-center gap-3 py-2.5 px-3 rounded-xl text-zinc-300 hover:bg-white/5">
+                  <FiPackage className="text-rose-400" /> Orders
+                </Link>
+                <button onClick={handleLogout} className="flex w-full text-left items-center gap-3 py-2.5 px-3 rounded-xl text-zinc-400 hover:bg-white/5">
+                  <FiLogOut /> Sign Out
                 </button>
-              </>
+              </div>
             ) : (
-              <>
-                <Link to="/login" className="block py-2.5 px-2 rounded-lg hover:bg-white/10">Login</Link>
-                <Link to="/register" className="block py-2.5 px-2 rounded-lg hover:bg-white/10">Register</Link>
-              </>
+               <div className="flex gap-3 pt-2">
+                 <Link to="/login" className="flex-1 text-center btn-secondary py-2.5">Log in</Link>
+                 <Link to="/register" className="flex-1 text-center btn-primary py-2.5">Sign up</Link>
+               </div>
             )}
-            <Link to="/admin/login" className="flex items-center space-x-1.5 py-2.5 px-2 rounded-lg hover:bg-white/10 text-orange-200 text-sm border-t border-orange-500/40 mt-1">
-              <FiSettings size={13} />
-              <span>Admin Login</span>
+            
+            <Link to="/admin/login" className="flex items-center justify-center space-x-2 py-3 mt-4 text-xs text-zinc-500 rounded-xl hover:bg-white/5">
+              <FiSettings size={14} /> <span>Admin Portal</span>
             </Link>
           </div>
         )}

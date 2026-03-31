@@ -1,49 +1,69 @@
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Coupon = require("../models/Coupon");
+const mongoose = require("mongoose");
 
-const TAX_RATE = 0.05; // 5% GST
+const TAX_RATE = 0.05;
 const DELIVERY_FEE_BASE = 30;
+const FREE_DELIVERY_THRESHOLD = 500;
 
 const placeOrder = async (req, res) => {
+  const session = await mongoose.startSession();
+
   try {
-    const { deliveryAddress, paymentMethod, orderNote, couponCode } = req.body;
+    let createdOrder;
 
-    if (!deliveryAddress || !deliveryAddress.trim()) {
-      return res.status(400).json({ message: "Delivery address is required" });
-    }
+    await session.withTransaction(async () => {
+      const { deliveryAddress, paymentMethod, orderNote, couponCode } = req.body;
 
-    const cart = await Cart.findOne({ userId: req.user._id }).populate("items.foodId");
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: "Your cart is empty" });
-    }
+      const cart = await Cart.findOne({ userId: req.user._id })
+        .populate("items.foodId")
+        .session(session);
 
-    const orderItems = cart.items
-      .filter((item) => item.foodId)
-      .map((item) => ({
-        foodId: item.foodId._id,
-        name: item.foodId.name,
-        price: item.foodId.price,
-        quantity: item.quantity,
-        image: item.foodId.image || "",
-        isVeg: item.foodId.isVeg ?? true,
-      }));
+      if (!cart || cart.items.length === 0) {
+        throw Object.assign(new Error("Your cart is empty"), { statusCode: 400 });
+      }
 
-    const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const deliveryFee = subtotal >= 500 ? 0 : DELIVERY_FEE_BASE;
-    const taxAmount = Math.round(subtotal * TAX_RATE);
+      const orderItems = cart.items
+        .filter((item) => item.foodId && item.foodId.isAvailable)
+        .map((item) => ({
+          foodId: item.foodId._id,
+          name: item.foodId.name,
+          price: item.foodId.price,
+          quantity: item.quantity,
+          image: item.foodId.image || "",
+          isVeg: item.foodId.isVeg ?? true,
+        }));
 
-    let discount = 0;
-    let appliedCouponCode = "";
-    if (couponCode && couponCode.trim()) {
-      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim(), isActive: true });
-      if (coupon && (!coupon.expiresAt || new Date() <= coupon.expiresAt)) {
-        if (subtotal >= coupon.minOrderAmount) {
-          const userUsage = coupon.usedBy.filter(
-            (u) => u.userId.toString() === req.user._id.toString()
-          ).length;
-          if (userUsage < coupon.perUserLimit) {
-            if (!coupon.usageLimit || coupon.usedCount < coupon.usageLimit) {
+      if (orderItems.length === 0) {
+        throw Object.assign(
+          new Error("No available items in your cart. Some items may have been removed."),
+          { statusCode: 400 }
+        );
+      }
+
+      const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE_BASE;
+      const taxAmount = Math.round(subtotal * TAX_RATE);
+
+      let discount = 0;
+      let appliedCouponCode = "";
+
+      if (couponCode && couponCode.trim()) {
+        const coupon = await Coupon.findOne({
+          code: couponCode.toUpperCase().trim(),
+          isActive: true,
+        }).session(session);
+
+        if (coupon && (!coupon.expiresAt || new Date() <= coupon.expiresAt)) {
+          if (subtotal >= coupon.minOrderAmount) {
+            const userUsage = coupon.usedBy.filter(
+              (u) => u.userId.toString() === req.user._id.toString()
+            ).length;
+
+            const globalUsageOk = !coupon.usageLimit || coupon.usedCount < coupon.usageLimit;
+
+            if (userUsage < coupon.perUserLimit && globalUsageOk) {
               if (coupon.discountType === "percentage") {
                 discount = (subtotal * coupon.discountValue) / 100;
                 if (coupon.maxDiscount) discount = Math.min(discount, coupon.maxDiscount);
@@ -52,57 +72,76 @@ const placeOrder = async (req, res) => {
               }
               discount = Math.round(Math.min(discount, subtotal));
               appliedCouponCode = coupon.code;
-              coupon.usedBy.push({ userId: req.user._id });
-              coupon.usedCount += 1;
-              await coupon.save();
+
+              await Coupon.findByIdAndUpdate(
+                coupon._id,
+                {
+                  $push: { usedBy: { userId: req.user._id } },
+                  $inc: { usedCount: 1 },
+                },
+                { session }
+              );
             }
           }
         }
       }
-    }
 
-    const totalAmount = subtotal + deliveryFee + taxAmount - discount;
-    const estimatedDelivery = new Date(Date.now() + 45 * 60 * 1000); // 45 min from now
+      const totalAmount = Math.max(0, subtotal + deliveryFee + taxAmount - discount);
+      const estimatedDelivery = new Date(Date.now() + 45 * 60 * 1000);
+      const paymentStatus = "Pending";
 
-    const order = await Order.create({
-      userId: req.user._id,
-      items: orderItems,
-      subtotal,
-      deliveryFee,
-      taxAmount,
-      discount,
-      totalAmount,
-      couponCode: appliedCouponCode,
-      deliveryAddress: deliveryAddress.trim(),
-      orderNote: orderNote || "",
-      paymentMethod: paymentMethod || "COD",
-      paymentStatus: paymentMethod === "Online" ? "Paid" : "Pending",
-      status: "Pending",
-      estimatedDelivery,
-      timeline: [{ status: "Pending", note: "Order placed successfully" }],
+      [createdOrder] = await Order.create(
+        [
+          {
+            userId: req.user._id,
+            items: orderItems,
+            subtotal,
+            deliveryFee,
+            taxAmount,
+            discount,
+            totalAmount,
+            couponCode: appliedCouponCode,
+            deliveryAddress: deliveryAddress.trim(),
+            orderNote: orderNote?.trim() || "",
+            paymentMethod: paymentMethod || "COD",
+            paymentStatus,
+            status: "Pending",
+            estimatedDelivery,
+            timeline: [{ status: "Pending", note: "Order placed successfully" }],
+          },
+        ],
+        { session }
+      );
+
+      await Cart.findByIdAndUpdate(
+        cart._id,
+        { items: [], totalAmount: 0 },
+        { session }
+      );
     });
 
-    cart.items = [];
-    cart.totalAmount = 0;
-    await cart.save();
-
-    res.status(201).json(order);
+    res.status(201).json(createdOrder);
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    const statusCode = error.statusCode || 500;
+    res.status(statusCode).json({ message: error.message || "Server error" });
+  } finally {
+    session.endSession();
   }
 };
 
 const getUserOrders = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 10));
     const skip = (page - 1) * limit;
 
-    const total = await Order.countDocuments({ userId: req.user._id });
-    const orders = await Order.find({ userId: req.user._id })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    const [total, orders] = await Promise.all([
+      Order.countDocuments({ userId: req.user._id }),
+      Order.find({ userId: req.user._id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+    ]);
 
     res.json({ orders, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
@@ -112,12 +151,17 @@ const getUserOrders = async (req, res) => {
 
 const getOrderById = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+
     const order = await Order.findById(req.params.id).populate("userId", "name email phone");
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     if (order.userId._id.toString() !== req.user._id.toString() && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not authorized" });
     }
+
     res.json(order);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -126,6 +170,10 @@ const getOrderById = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: "Order not found" });
 
@@ -137,7 +185,7 @@ const cancelOrder = async (req, res) => {
     }
 
     order.status = "Cancelled";
-    order.cancelReason = req.body.reason || "Cancelled by customer";
+    order.cancelReason = req.body.reason?.trim() || "Cancelled by customer";
     order.timeline.push({ status: "Cancelled", note: order.cancelReason });
     await order.save();
 
@@ -149,20 +197,22 @@ const cancelOrder = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
     const skip = (page - 1) * limit;
-    const { status, search } = req.query;
+    const { status } = req.query;
 
     const filter = {};
     if (status && status !== "All") filter.status = status;
 
-    const total = await Order.countDocuments(filter);
-    const orders = await Order.find(filter)
-      .populate("userId", "name email phone")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    const [total, orders] = await Promise.all([
+      Order.countDocuments(filter),
+      Order.find(filter)
+        .populate("userId", "name email phone")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+    ]);
 
     res.json({ orders, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
@@ -179,18 +229,33 @@ const updateOrderStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status value" });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     order.status = status;
-    order.timeline.push({ status, note: note || "" });
+    order.timeline.push({ status, note: note?.trim() || "" });
 
-    if (status === "Delivered") {
+    if (status === "Delivered" && order.paymentMethod === "COD") {
       order.paymentStatus = "Paid";
     }
 
     await order.save();
+
     const populated = await Order.findById(order._id).populate("userId", "name email");
+
+    const io = require("../server").io;
+    if (io) {
+      io.to(`order_${populated._id}`).emit("order:updated", {
+        status: populated.status,
+        paymentStatus: populated.paymentStatus,
+        timeline: populated.timeline,
+      });
+    }
+
     res.json(populated);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -199,25 +264,33 @@ const updateOrderStatus = async (req, res) => {
 
 const reorder = async (req, res) => {
   try {
-    const FoodItem = require("../models/FoodItem");
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
 
+    const FoodItem = require("../models/FoodItem");
     const order = await Order.findOne({ _id: req.params.id, userId: req.user._id });
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     let cart = await Cart.findOne({ userId: req.user._id });
     if (!cart) cart = new Cart({ userId: req.user._id, items: [], totalAmount: 0 });
 
+    const foodIds = order.items.map((i) => i.foodId).filter(Boolean);
+    const foods = await FoodItem.find({ _id: { $in: foodIds }, isAvailable: true });
+    const foodMap = {};
+    foods.forEach((f) => { foodMap[f._id.toString()] = f; });
+
     let addedCount = 0;
     for (const item of order.items) {
       if (!item.foodId) continue;
-      const food = await FoodItem.findById(item.foodId);
-      if (!food || !food.isAvailable) continue;
+      const food = foodMap[item.foodId.toString()];
+      if (!food) continue;
 
       const idx = cart.items.findIndex((i) => i.foodId.toString() === item.foodId.toString());
       if (idx > -1) {
-        cart.items[idx].quantity += item.quantity;
+        cart.items[idx].quantity = Math.min(cart.items[idx].quantity + item.quantity, 50);
       } else {
-        cart.items.push({ foodId: item.foodId, quantity: item.quantity });
+        cart.items.push({ foodId: item.foodId, quantity: Math.min(item.quantity, 50) });
       }
       addedCount++;
     }
@@ -226,14 +299,13 @@ const reorder = async (req, res) => {
       return res.status(400).json({ message: "No available items from this order to reorder" });
     }
 
-    let total = 0;
-    for (const cartItem of cart.items) {
-      const food = await FoodItem.findById(cartItem.foodId);
-      if (food) total += food.price * cartItem.quantity;
-    }
-    cart.totalAmount = total;
-    await cart.save();
+    const priceMap = {};
+    foods.forEach((f) => { priceMap[f._id.toString()] = f.price; });
+    cart.totalAmount = cart.items.reduce((total, item) => {
+      return total + (priceMap[item.foodId.toString()] || 0) * item.quantity;
+    }, 0);
 
+    await cart.save();
     const populated = await Cart.findById(cart._id).populate("items.foodId");
     res.json(populated);
   } catch (error) {
@@ -241,4 +313,7 @@ const reorder = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder, getUserOrders, getOrderById, cancelOrder, getAllOrders, updateOrderStatus, reorder };
+module.exports = {
+  placeOrder, getUserOrders, getOrderById,
+  cancelOrder, getAllOrders, updateOrderStatus, reorder,
+};

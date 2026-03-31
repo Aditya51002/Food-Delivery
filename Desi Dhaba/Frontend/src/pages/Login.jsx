@@ -15,7 +15,7 @@ const Login = () => {
     setLoading(true);
     try {
       const user = await login(email, password);
-      toast.success("Login successful!");
+      toast.success("Login successful!", { style: { background: '#18181b', color: '#fff', border: '1px solid #3f3f46' } });
       if (user.role === "admin") {
         navigate("/admin/dashboard");
       } else {
@@ -29,47 +29,51 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">Welcome Back</h2>
-        <p className="text-center text-gray-500 mb-8">Sign in to your account</p>
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-rose-500/10 rounded-full blur-[100px] pointer-events-none" />
+      
+      <div className="max-w-md w-full glass-card rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/5 relative z-10">
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Welcome Back</h2>
+          <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Sign in to your account</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest pl-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
+              className="glass-input transition-all duration-300 focus:bg-zinc-800 focus:border-rose-500/50"
               placeholder="you@example.com"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest pl-1">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
+              className="glass-input transition-all duration-300 focus:bg-zinc-800 focus:border-rose-500/50 font-mono tracking-widest"
               placeholder="••••••••"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-600 text-white py-2.5 rounded-lg font-medium hover:bg-orange-700 transition disabled:opacity-50"
+            className="w-full btn-primary py-3.5 text-base tracking-widest uppercase mt-4 shadow-[0_10px_30px_rgba(244,63,94,0.3)] disabled:opacity-50"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Authenticating..." : "Sign In"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm font-medium text-zinc-500 mt-8">
           Don't have an account?{" "}
-          <Link to="/register" className="text-orange-600 font-medium hover:underline">
-            Register
+          <Link to="/register" className="text-rose-400 font-bold hover:text-rose-300 transition-colors">
+            Register for access
           </Link>
         </p>
       </div>

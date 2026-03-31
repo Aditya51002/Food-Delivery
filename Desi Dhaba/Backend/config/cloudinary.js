@@ -13,10 +13,23 @@ const storage = new CloudinaryStorage({
   params: {
     folder: "desi-dhaba",
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
-    transformation: [{ width: 800, height: 600, crop: "limit" }],
+    transformation: [{ width: 800, height: 600, crop: "limit", quality: "auto" }],
   },
 });
 
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  const allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  if (allowedMimes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only JPEG, PNG, and WebP images are allowed"), false);
+  }
+};
 
-module.exports = { cloudinary, upload };
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+module.exports = { cloudinary, storage, upload };

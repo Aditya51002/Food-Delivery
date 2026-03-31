@@ -2,20 +2,41 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+const generateAccessToken = (id, role) =>
+  jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "15m" });
+
+const generateRefreshToken = (id) =>
+  jwt.sign({ id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "30d" });
+
+const REFRESH_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  maxAge: 30 * 24 * 60 * 60 * 1000,
+  path: "/",
+};
+
+const sendAuthResponse = (res, user, statusCode = 200) => {
+  const accessToken = generateAccessToken(user._id, user.role);
+  const refreshToken = generateRefreshToken(user._id);
+
+  res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
+
+  return res.status(statusCode).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    avatar: user.avatar,
+    role: user.role,
+    savedAddresses: user.savedAddresses,
+    accessToken,
+  });
 };
 
 const register = async (req, res) => {
   try {
     const { name, email, password, phone, role } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "Please fill all required fields" });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
-    }
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -33,18 +54,7 @@ const register = async (req, res) => {
       role: role === "admin" && process.env.ALLOW_ADMIN_REGISTER === "true" ? "admin" : "user",
     });
 
-    const token = generateToken(user._id, user.role);
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      avatar: user.avatar,
-      role: user.role,
-      savedAddresses: user.savedAddresses,
-      token,
-    });
+    return sendAuthResponse(res, user, 201);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -53,10 +63,6 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Please provide email and password" });
-    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -72,21 +78,55 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = generateToken(user._id, user.role);
+    return sendAuthResponse(res, user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      avatar: user.avatar,
-      role: user.role,
-      savedAddresses: user.savedAddresses,
-      token,
+const refreshToken = async (req, res) => {
+  try {
+    const token = req.cookies?.refreshToken;
+    if (!token) {
+      return res.status(401).json({ message: "No refresh token provided" });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+    } catch {
+      return res.status(401).json({ message: "Refresh token expired or invalid. Please log in again." });
+    }
+
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user || !user.isActive) {
+      return res.status(401).json({ message: "User not found or deactivated" });
+    }
+
+    const newAccessToken = generateAccessToken(user._id, user.role);
+    const newRefreshToken = generateRefreshToken(user._id);
+    res.cookie("refreshToken", newRefreshToken, REFRESH_COOKIE_OPTIONS);
+
+    return res.json({
+      accessToken: newAccessToken,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        avatar: user.avatar,
+        role: user.role,
+        savedAddresses: user.savedAddresses,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
+};
+
+const logout = (req, res) => {
+  res.clearCookie("refreshToken", { ...REFRESH_COOKIE_OPTIONS, maxAge: 0 });
+  res.json({ message: "Logged out successfully" });
 };
 
 const getMe = async (req, res) => {
@@ -120,13 +160,6 @@ const updateProfile = async (req, res) => {
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: "Both current and new password are required" });
-    }
-    if (newPassword.length < 6) {
-      return res.status(400).json({ message: "New password must be at least 6 characters" });
-    }
 
     const user = await User.findById(req.user._id);
     const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -191,4 +224,15 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile, changePassword, addAddress, deleteAddress, getAllUsers };
+module.exports = {
+  register,
+  login,
+  refreshToken,
+  logout,
+  getMe,
+  updateProfile,
+  changePassword,
+  addAddress,
+  deleteAddress,
+  getAllUsers,
+};

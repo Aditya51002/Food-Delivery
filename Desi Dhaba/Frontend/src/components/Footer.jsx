@@ -1,97 +1,90 @@
 import { Link } from "react-router-dom";
+import { FiFacebook, FiTwitter, FiInstagram } from "react-icons/fi";
 import { MdOutlineRiceBowl } from "react-icons/md";
-import { FiInstagram, FiTwitter, FiFacebook, FiMail, FiPhone, FiMapPin } from "react-icons/fi";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
-
+    <footer className="glass-panel mx-2 mb-2 rounded-t-3xl text-zinc-400 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="bg-orange-600 p-1.5 rounded-xl">
-                <MdOutlineRiceBowl size={20} className="text-yellow-300" />
+            <div className="flex items-center space-x-2 text-white mb-6">
+              <div className="bg-gradient-to-br from-rose-500 to-rose-700 p-2 rounded-xl shadow-[0_0_15px_rgba(244,63,94,0.3)]">
+                <MdOutlineRiceBowl size={24} className="text-white" />
               </div>
-              <span className="text-white text-xl font-extrabold">Desi Dhaba</span>
+              <div>
+                <span className="text-xl font-black tracking-tight">Desi Dhaba</span>
+                <span className="block text-[9px] text-rose-400 font-bold tracking-[0.2em] uppercase">
+                  Midnight Gourmet
+                </span>
+              </div>
             </div>
-            <p className="text-sm leading-relaxed text-gray-400">
-              Bringing authentic Indian flavours to your doorstep. Fresh, fast, and always delicious.
+            <p className="text-sm leading-relaxed text-zinc-500">
+              The premium delivery experience. Authentic flavors, hyper-fast delivery, served around the clock.
             </p>
-            <div className="flex items-center space-x-3 mt-5">
-              {[FiInstagram, FiTwitter, FiFacebook].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="w-9 h-9 rounded-full bg-gray-800 hover:bg-orange-600 flex items-center justify-center transition-colors"
-                >
-                  <Icon size={16} />
-                </a>
-              ))}
+          </div>
+
+          <div>
+            <h3 className="text-white font-bold mb-4 tracking-wider text-xs uppercase opacity-80">
+              Quick Links
+            </h3>
+            <ul className="space-y-3">
+              <li>
+                <Link to="/" className="hover:text-rose-400 transition-colors text-sm">Home</Link>
+              </li>
+              <li>
+                <Link to="/orders" className="hover:text-rose-400 transition-colors text-sm">Track Order</Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-rose-400 transition-colors text-sm">Login</Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-white font-bold mb-4 tracking-wider text-xs uppercase opacity-80">
+              Legal
+            </h3>
+            <ul className="space-y-3">
+              <li>
+                <a href="#" className="hover:text-rose-400 transition-colors text-sm">Terms & Conditions</a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-rose-400 transition-colors text-sm">Privacy Policy</a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-rose-400 transition-colors text-sm">Refund Policy</a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-white font-bold mb-4 tracking-wider text-xs uppercase opacity-80">
+              Connect With Us
+            </h3>
+            <div className="flex space-x-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-zinc-800 border border-white/5 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all hover:scale-110 shadow-lg">
+                <FiFacebook size={18} />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-zinc-800 border border-white/5 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all hover:scale-110 shadow-lg">
+                <FiTwitter size={18} />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-zinc-800 border border-white/5 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all hover:scale-110 shadow-lg">
+                <FiInstagram size={18} />
+              </a>
             </div>
-          </div>
-
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase">Quick Links</h3>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                { to: "/", label: "Home" },
-                { to: "/orders", label: "My Orders" },
-                { to: "/cart", label: "Cart" },
-                { to: "/profile", label: "My Profile" },
-              ].map((l) => (
-                <li key={l.to}>
-                  <Link to={l.to} className="hover:text-orange-400 transition">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase">Legal</h3>
-            <ul className="space-y-2.5 text-sm">
-              {[
-                "Terms of Service",
-                "Privacy Policy",
-                "Refund Policy",
-                "Cookie Policy",
-              ].map((l) => (
-                <li key={l}>
-                  <a href="#" className="hover:text-orange-400 transition">{l}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase">Contact Us</h3>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start space-x-2.5">
-                <FiMapPin size={15} className="text-orange-500 mt-0.5 flex-shrink-0" />
-                <span>12, Food Street, Spice City, India – 110001</span>
-              </li>
-              <li className="flex items-center space-x-2.5">
-                <FiPhone size={15} className="text-orange-500 flex-shrink-0" />
-                <span>+91 98765 43210</span>
-              </li>
-              <li className="flex items-center space-x-2.5">
-                <FiMail size={15} className="text-orange-500 flex-shrink-0" />
-                <span>hello@desidhaba.in</span>
-              </li>
-            </ul>
+            <p className="mt-6 text-sm text-zinc-500 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
+              All systems operational
+            </p>
           </div>
         </div>
-
-        <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-xs text-gray-500">
-            © {new Date().getFullYear()} Desi Dhaba. All rights reserved.
-          </p>
-          <div className="flex items-center space-x-4 text-xs text-gray-500">
-            <span>Made with ❤️ in India</span>
-            <span>•</span>
-            <span>Powered by Desi Dhaba Platform v2.0</span>
+        
+        <div className="mt-12 pt-8 border-t border-white/10 text-center text-sm text-zinc-600 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p>© {new Date().getFullYear()} Midnight Gourmet / Desi Dhaba. All rights reserved.</p>
+          <div className="flex gap-4">
+            <span className="hover:text-zinc-300 cursor-pointer transition-colors">Cookie Policy</span>
+            <span className="hover:text-zinc-300 cursor-pointer transition-colors">Accessibility</span>
           </div>
         </div>
       </div>

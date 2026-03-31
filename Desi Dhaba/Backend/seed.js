@@ -241,14 +241,13 @@ const seed = async () => {
   } else {
     console.log(`ℹ️  ${existing} food items already exist – skipping`);
   }
-
   console.log("\n🎉 Seed complete!");
   console.log("───────────────────────────────");
   console.log("Admin login → admin@desidhaba.com / Admin@123");
   console.log("───────────────────────────────\n");
 
   await mongoose.connection.close();
-  process.exit(0);
+  process.exit(0);``
 };
 
 seed().catch((err) => {

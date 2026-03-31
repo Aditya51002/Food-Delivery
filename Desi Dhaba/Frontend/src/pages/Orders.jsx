@@ -17,12 +17,12 @@ const PIPELINE = [
 ];
 
 const STATUS_COLOR = {
-  Pending:            { badge: "bg-yellow-100 text-yellow-800" },
-  Confirmed:          { badge: "bg-sky-100 text-sky-800" },
-  Preparing:          { badge: "bg-blue-100 text-blue-800" },
-  "Out for Delivery": { badge: "bg-purple-100 text-purple-800" },
-  Delivered:          { badge: "bg-green-100 text-green-800" },
-  Cancelled:          { badge: "bg-red-100 text-red-800" },
+  Pending:            { badge: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30" },
+  Confirmed:          { badge: "bg-sky-500/20 text-sky-400 border border-sky-500/30" },
+  Preparing:          { badge: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" },
+  "Out for Delivery": { badge: "bg-purple-500/20 text-purple-400 border border-purple-500/30" },
+  Delivered:          { badge: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.3)]" },
+  Cancelled:          { badge: "bg-red-500/20 text-red-500 border border-red-500/30" },
 };
 
 const ACTIVE_STATUSES = ["Pending", "Confirmed", "Preparing", "Out for Delivery"];
@@ -52,9 +52,9 @@ const ETACountdown = ({ estimatedDelivery, status }) => {
   if (!display) return null;
 
   return (
-    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 border border-orange-100">
-      <FiClock size={13} className="text-orange-500 animate-pulse" />
-      <span className="text-xs font-bold text-orange-700 tabular-nums">ETA: {display}</span>
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 shadow-inner">
+      <FiClock size={13} className="text-rose-400 animate-pulse" />
+      <span className="text-xs font-black text-rose-400 tabular-nums tracking-widest uppercase">ETA: {display}</span>
     </div>
   );
 };
@@ -62,9 +62,9 @@ const ETACountdown = ({ estimatedDelivery, status }) => {
 const OrderTimeline = ({ status }) => {
   if (status === "Cancelled") {
     return (
-      <div className="flex items-center space-x-2 py-3 px-4 rounded-xl bg-red-50 border border-red-100">
-        <FiXCircle size={18} className="text-red-500 flex-shrink-0" />
-        <span className="text-sm font-medium text-red-600">This order was cancelled</span>
+      <div className="flex items-center space-x-3 py-4 px-5 rounded-2xl bg-red-500/10 border border-red-500/20">
+        <FiXCircle size={20} className="text-red-500 flex-shrink-0" />
+        <span className="text-sm font-bold text-red-400">This order was cancelled</span>
       </div>
     );
   }
@@ -72,12 +72,12 @@ const OrderTimeline = ({ status }) => {
   const currentIdx = PIPELINE.findIndex((s) => s.key === status);
 
   return (
-    <div className="relative flex items-start justify-between py-3 px-2 overflow-x-auto">
-      <div className="absolute top-[22px] left-8 right-8 h-px" style={{ background: "#e5e7eb" }} />
+    <div className="relative flex items-start justify-between py-4 px-2 overflow-x-auto scrollbar-hide">
+      <div className="absolute top-[28px] left-10 right-10 h-1 bg-zinc-800 rounded-full" />
       <div
-        className="absolute top-[22px] left-8 h-px transition-all duration-700"
+        className="absolute top-[28px] left-10 h-1 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(244,63,94,0.5)]"
         style={{
-          background: "linear-gradient(90deg, #f97316, #ea580c)",
+          background: "linear-gradient(90deg, #f59e0b, #f43f5e)",
           width: currentIdx === -1 ? "0%" : `${(currentIdx / (PIPELINE.length - 1)) * 84}%`,
           maxWidth: "84%",
         }}
@@ -88,28 +88,27 @@ const OrderTimeline = ({ status }) => {
         const Icon = step.icon;
         const isOnTheWay = active && step.key === "Out for Delivery";
         return (
-          <div key={step.key} className="relative flex flex-col items-center z-10 flex-1 min-w-0 px-1">
+          <div key={step.key} className="relative flex flex-col items-center z-10 flex-1 min-w-[70px] px-1 group">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                isOnTheWay ? "animate-pulse" : ""
-              }`}
+              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-xl ${
+                isOnTheWay ? "animate-pulse shadow-[0_0_20px_rgba(244,63,94,0.6)]" : ""
+              } ${active ? "scale-110" : ""}`}
               style={{
                 background: done
-                  ? active ? "linear-gradient(135deg, #f97316, #ea580c)" : "#fed7aa"
-                  : "#f3f4f6",
-                border: active ? "3px solid #f97316" : `2px solid ${done ? "#fed7aa" : "#e5e7eb"}`,
-                boxShadow: active ? "0 0 0 4px #fde7cd" : "none",
+                  ? active ? "linear-gradient(135deg, #f59e0b, #f43f5e)" : "#f43f5e"
+                  : "#27272a",
+                border: active ? "3px solid #18181b" : `2px solid ${done ? "#be123c" : "#3f3f46"}`,
+                boxShadow: active ? "0 0 0 4px rgba(244,63,94,0.3)" : "none",
               }}
             >
-              <Icon size={16} color={done ? (active ? "#fff" : "#c2410c") : "#9ca3af"} />
+              <Icon size={18} color={done ? "#fff" : "#71717a"} />
             </div>
             <p
-              className="mt-1.5 text-center leading-tight"
+              className="mt-3 text-center leading-tight tracking-wider uppercase transition-colors"
               style={{
                 fontSize: "10px",
-                fontWeight: active ? 700 : done ? 600 : 400,
-                color: active ? "#c2410c" : done ? "#6b7280" : "#9ca3af",
-                whiteSpace: "nowrap",
+                fontWeight: active ? 900 : done ? 700 : 600,
+                color: active ? "#f43f5e" : done ? "#a1a1aa" : "#52525b",
               }}
             >
               {step.label}
@@ -137,28 +136,28 @@ const ReorderButton = ({ orderId, onReorder }) => {
     <button
       onClick={handleClick}
       disabled={loading}
-      className="flex items-center gap-1.5 text-xs font-semibold text-orange-600 border border-orange-200 hover:bg-orange-50 hover:border-orange-400 px-3 py-1.5 rounded-lg transition-all duration-150 disabled:opacity-60"
+      className="flex items-center gap-1.5 text-xs font-bold text-rose-400 border border-rose-500/30 hover:bg-rose-500 hover:text-white px-4 py-2 rounded-xl transition-all duration-300 disabled:opacity-60 shadow-sm"
     >
-      <FiRepeat size={13} className={loading ? "animate-spin" : ""} />
+      <FiRepeat size={14} className={loading ? "animate-spin" : ""} />
       <span>{loading ? "Adding…" : "Reorder"}</span>
     </button>
   );
 };
 
 const OrderSkeleton = () => (
-  <div className="space-y-5 animate-pulse">
+  <div className="space-y-6 animate-pulse">
     {[1, 2, 3].map((i) => (
-      <div key={i} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div className="px-6 pt-5 pb-4 flex justify-between">
-          <div className="space-y-2">
-            <div className="h-3 bg-gray-200 rounded w-28" />
-            <div className="h-3 bg-gray-200 rounded w-20" />
+      <div key={i} className="glass-card overflow-hidden rounded-3xl">
+        <div className="px-6 pt-6 pb-4 flex justify-between">
+          <div className="space-y-3">
+            <div className="h-4 bg-zinc-800 rounded w-32" />
+            <div className="h-3 bg-zinc-800 rounded w-24" />
           </div>
-          <div className="h-6 bg-gray-200 rounded-full w-20" />
+          <div className="h-8 bg-zinc-800 rounded-full w-24" />
         </div>
-        <div className="px-6 pb-5 space-y-2">
-          <div className="h-3 bg-gray-100 rounded w-full" />
-          <div className="h-3 bg-gray-100 rounded w-3/4" />
+        <div className="px-6 pb-6 space-y-3">
+          <div className="h-3 bg-zinc-800 rounded w-full" />
+          <div className="h-3 bg-zinc-800 rounded w-3/4" />
         </div>
       </div>
     ))}
@@ -188,115 +187,120 @@ const Orders = () => {
     try {
       await API.post(`/orders/${orderId}/reorder`);
       await fetchCart();
-      toast.success("Items added to cart! 🛒", { duration: 2500 });
+      toast.success("Items added to cart! 🛒", { duration: 2500, style: { background: '#18181b', color: '#fff', border: '1px solid #3f3f46' } });
     } catch {
       toast.error("Some items may no longer be available");
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-4xl mx-auto px-4 py-12 min-h-screen">
+      <div className="flex items-end justify-between mb-10 border-b border-white/10 pb-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">My Orders</h1>
+          <h1 className="text-3xl font-black text-white tracking-tight">Order Journey</h1>
           {!loading && orders.length > 0 && (
-            <p className="text-sm text-gray-400 mt-0.5">{orders.length} order{orders.length > 1 ? "s" : ""} total</p>
+            <p className="text-sm text-zinc-500 mt-1 font-bold uppercase tracking-widest">{orders.length} order{orders.length > 1 ? "s" : ""} history</p>
           )}
         </div>
         <button
           onClick={fetchOrders}
-          className="flex items-center space-x-1.5 text-sm text-gray-500 hover:text-orange-600 border border-gray-200 hover:border-orange-300 px-3 py-1.5 rounded-lg transition"
+          className="flex items-center space-x-2 text-sm text-zinc-400 hover:text-white bg-zinc-900 border border-white/5 hover:border-white/20 px-4 py-2 rounded-xl transition shadow-lg"
         >
-          <FiRefreshCw size={14} />
-          <span>Refresh</span>
+          <FiRefreshCw size={14} className={loading ? "animate-spin text-rose-500" : ""} />
+          <span className="font-semibold">Refresh</span>
         </button>
       </div>
 
       {loading ? (
         <OrderSkeleton />
       ) : orders.length === 0 ? (
-        <div className="text-center py-16">
-          <FiPackage size={64} className="mx-auto text-gray-300 mb-4" />
-          <h2 className="text-xl font-semibold text-gray-600 mb-1">No orders yet</h2>
-          <p className="text-gray-400 mb-6">Your order history will appear here.</p>
+        <div className="glass-panel text-center py-24 rounded-3xl border border-white/5">
+          <div className="w-24 h-24 rounded-full bg-zinc-800 flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <FiPackage size={40} className="text-zinc-500" />
+          </div>
+          <h2 className="text-2xl font-black text-white mb-2">No masterclasses ordered yet</h2>
+          <p className="text-zinc-400 mb-8 font-medium">Your culinary journey awaits. Begin exploring our exclusive menus.</p>
           <Link
             to="/"
-            className="inline-block bg-orange-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-orange-700 transition text-sm"
+            className="btn-primary inline-block px-8 py-3.5 text-base shadow-[0_10px_30px_rgba(244,63,94,0.3)]"
           >
-            Browse Restaurants
+            Discover Menus
           </Link>
         </div>
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-8">
           {orders.map((order) => {
-            const sc = STATUS_COLOR[order.status] ?? { badge: "bg-gray-100 text-gray-800" };
+            const sc = STATUS_COLOR[order.status] ?? { badge: "bg-zinc-800 text-zinc-300 border border-zinc-700" };
             const isActive = ACTIVE_STATUSES.includes(order.status);
             const isDelivered = order.status === "Delivered";
 
             return (
               <div
                 key={order._id}
-                className={`bg-white rounded-2xl shadow-md overflow-hidden transition-shadow hover:shadow-lg ${
-                  isActive ? "ring-1 ring-orange-100" : ""
+                className={`glass-card rounded-3xl overflow-hidden transition-all duration-300 border ${
+                  isActive ? "border-rose-500/30 shadow-[0_0_30px_rgba(244,63,94,0.1)]" : "border-white/5"
                 }`}
               >
-                <div className="px-6 pt-5 pb-4 flex flex-wrap justify-between items-start gap-3">
+                <div className="px-6 sm:px-8 pt-6 pb-5 flex flex-wrap justify-between items-start gap-4">
                   <div>
-                    <p className="text-xs text-gray-400 font-mono font-semibold tracking-wider">
+                    <Link
+                      to={`/orders/${order._id}`}
+                      className="text-sm font-mono font-black text-rose-400 hover:text-rose-300 transition-colors tracking-widest drop-shadow-md"
+                    >
                       #{order._id.slice(-8).toUpperCase()}
-                    </p>
-                    <div className="flex items-center text-xs text-gray-500 mt-0.5 space-x-1">
-                      <FiClock size={11} />
-                      <span>{new Date(order.createdAt).toLocaleString()}</span>
+                    </Link>
+                    <div className="flex items-center text-xs text-zinc-500 mt-1 space-x-1.5 font-medium">
+                      <FiClock size={12} className="text-indigo-400" />
+                      <span>{new Date(order.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-3 flex-wrap">
                     {isActive && (
                       <ETACountdown
                         estimatedDelivery={order.estimatedDelivery}
                         status={order.status}
                       />
                     )}
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${sc.badge}`}>
+                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase ${sc.badge}`}>
                       {order.status}
                     </span>
                   </div>
                 </div>
 
-                <div className="px-4 pb-2">
+                <div className="px-4 sm:px-6 pb-4">
                   <OrderTimeline status={order.status} />
                 </div>
 
-                <div className="mx-6 border-t border-gray-100" />
+                <div className="mx-6 sm:mx-8 border-t border-white/5" />
 
-                <div className="px-6 py-4 space-y-1.5">
+                <div className="px-6 sm:px-8 py-5 space-y-2">
                   {order.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span className="text-gray-600">
-                        {item.name} <span className="text-gray-400">× {item.quantity}</span>
+                    <div key={idx} className="flex justify-between items-center text-sm group">
+                      <span className="text-zinc-300 font-medium group-hover:text-white transition-colors">
+                        {item.name} <span className="text-zinc-600 font-bold ml-1">× {item.quantity}</span>
                       </span>
-                      <span className="font-medium text-gray-700">₹{item.price * item.quantity}</span>
+                      <span className="font-bold text-zinc-100 bg-zinc-900 px-3 py-1 rounded-lg border border-white/5">₹{item.price * item.quantity}</span>
                     </div>
                   ))}
                 </div>
 
-                <div
-                  className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 rounded-bl-2xl rounded-br-2xl"
-                  style={{ background: "#fafafa", borderTop: "1px solid #f3f4f6" }}
-                >
-                  <div className="text-xs text-gray-500 space-y-0.5">
-                    <p className="flex items-center gap-1">
-                      <FiMapPin size={11} /> {order.deliveryAddress}
+                <div className="flex flex-wrap items-center justify-between gap-4 px-6 sm:px-8 py-5 bg-zinc-950/50 border-t border-white/5">
+                  <div className="text-xs text-zinc-400 space-y-1.5 font-medium">
+                    <p className="flex items-center gap-2">
+                      <FiMapPin size={12} className="text-emerald-400" /> <span className="truncate max-w-[200px] sm:max-w-xs">{order.deliveryAddress}</span>
                     </p>
-                    <p className="flex items-center gap-1">
-                      <FiCreditCard size={11} /> {order.paymentMethod}
+                    <p className="flex items-center gap-2">
+                      <FiCreditCard size={12} className="text-indigo-400" /> {order.paymentMethod} Payment
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     {isDelivered && (
                       <ReorderButton orderId={order._id} onReorder={handleReorder} />
                     )}
-                    <p className="text-lg font-bold text-orange-600">₹{order.totalAmount}</p>
+                    <div className="text-right">
+                      <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mb-0.5">Total</p>
+                      <p className="text-2xl font-black text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.3)]">₹{order.totalAmount}</p>
+                    </div>
                   </div>
                 </div>
               </div>

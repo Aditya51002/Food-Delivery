@@ -5,23 +5,77 @@ const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
+const mongoose = require("mongoose");
 const connectDB = require("./config/db");
+
+const http = require("http");
+const { Server } = require("socket.io");
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
 
-connectDB();
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`⚡ Socket connected: ${socket.id}`);
+
+  socket.on("join_order", (orderId) => {
+    socket.join(`order_${orderId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`🔌 Socket disconnected: ${socket.id}`);
+  });
+});
+
+module.exports.io = io;
+
+connectDB().then(() => {
+  ensureIndexes();
+});
+
+async function ensureIndexes() {
+  try {
+    const Order = require("./models/Order");
+    const Cart = require("./models/Cart");
+    const Review = require("./models/Review");
+    const FoodItem = require("./models/FoodItem");
+    const Restaurant = require("./models/Restaurant");
+
+    await Order.collection.createIndex({ userId: 1, createdAt: -1 });
+    await Order.collection.createIndex({ status: 1, createdAt: -1 });
+    await Order.collection.createIndex({ restaurantId: 1, createdAt: -1 });
+    await Cart.collection.createIndex({ userId: 1 }, { unique: true });
+    await Review.collection.createIndex({ targetId: 1, targetType: 1 });
+    await Review.collection.createIndex({ userId: 1, targetId: 1, targetType: 1 }, { unique: true });
+    await FoodItem.collection.createIndex({ restaurantId: 1, isAvailable: 1 });
+    await FoodItem.collection.createIndex({ category: 1 });
+    await Restaurant.collection.createIndex({ isActive: 1, isOpen: 1 });
+
+    console.log("✅  MongoDB indexes ensured");
+  } catch (err) {
+    console.error("[INDEX] Failed to create indexes:", err.message);
+  }
+}
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 200,
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: "Too many requests, please try again later." },
 });
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -29,8 +83,9 @@ const authLimiter = rateLimit({
 });
 
 app.use("/api/", apiLimiter);
-app.use("/api/auth/login", authLimiter);
-app.use("/api/auth/register", authLimiter);
+app.use("/api/v1/auth/login", authLimiter);
+app.use("/api/v1/auth/register", authLimiter);
+app.use("/api/v1/auth/refresh", authLimiter);
 
 app.use(
   cors({
@@ -38,6 +93,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
@@ -46,20 +102,34 @@ if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/restaurants", require("./routes/restaurantRoutes"));
-app.use("/api/foods", require("./routes/foodRoutes"));
-app.use("/api/cart", require("./routes/cartRoutes"));
-app.use("/api/orders", require("./routes/orderRoutes"));
-app.use("/api/reviews", require("./routes/reviewRoutes"));
-app.use("/api/coupons", require("./routes/couponRoutes"));
-app.use("/api/analytics", require("./routes/analyticsRoutes"));
+app.get("/health", (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = ["disconnected", "connected", "connecting", "disconnecting"][dbState] || "unknown";
+  res.status(dbState === 1 ? 200 : 503).json({
+    status: dbState === 1 ? "healthy" : "degraded",
+    db: dbStatus,
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    version: "2.0.0",
+  });
+});
+
+app.use("/api/v1/auth", require("./routes/authRoutes"));
+app.use("/api/v1/restaurants", require("./routes/restaurantRoutes"));
+app.use("/api/v1/foods", require("./routes/foodRoutes"));
+app.use("/api/v1/cart", require("./routes/cartRoutes"));
+app.use("/api/v1/orders", require("./routes/orderRoutes"));
+app.use("/api/v1/reviews", require("./routes/reviewRoutes"));
+app.use("/api/v1/coupons", require("./routes/couponRoutes"));
+app.use("/api/v1/analytics", require("./routes/analyticsRoutes"));
+app.use("/api/v1/payments", require("./routes/paymentRoutes"));
 
 app.get("/", (req, res) => {
   res.json({
     status: "ok",
     message: "Desi Dhaba API is running 🚀",
     version: "2.0.0",
+    apiBase: "/api/v1",
     timestamp: new Date().toISOString(),
   });
 });
@@ -78,6 +148,8 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`✅  Server running on port ${PORT} [${process.env.NODE_ENV || "development"}]`);
+  console.log(`📡  API Base: http://localhost:${PORT}/api/v1`);
+  console.log(`❤️   Health:  http://localhost:${PORT}/health`);
 });

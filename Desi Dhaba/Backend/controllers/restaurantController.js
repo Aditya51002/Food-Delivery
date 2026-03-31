@@ -2,6 +2,21 @@ const Restaurant = require("../models/Restaurant");
 const FoodItem = require("../models/FoodItem");
 const { cloudinary } = require("../config/cloudinary");
 
+const getCloudinaryPublicId = (url) => {
+  if (!url || !url.includes("cloudinary")) return null;
+  const parts = url.split("/");
+  const filename = parts[parts.length - 1];
+  const folder = parts[parts.length - 2];
+  return `${folder}/${filename.split(".")[0]}`;
+};
+
+const safeDestroyImage = async (url) => {
+  const publicId = getCloudinaryPublicId(url);
+  if (publicId) {
+    try { await cloudinary.uploader.destroy(publicId); } catch { }
+  }
+};
+
 const createRestaurant = async (req, res) => {
   try {
     const { name, description, address, isActive, isOpen, cuisine, tags,
@@ -13,8 +28,8 @@ const createRestaurant = async (req, res) => {
       image,
       description: description || "",
       address,
-      isActive: isActive !== undefined ? isActive : true,
-      isOpen: isOpen !== undefined ? isOpen : true,
+      isActive: isActive !== undefined ? (isActive === "true" || isActive === true) : true,
+      isOpen: isOpen !== undefined ? (isOpen === "true" || isOpen === true) : true,
       cuisine: cuisine ? (Array.isArray(cuisine) ? cuisine : cuisine.split(",").map((c) => c.trim())) : [],
       tags: tags ? (Array.isArray(tags) ? tags : tags.split(",").map((t) => t.trim())) : [],
       deliveryTime: deliveryTime || "30-40 min",
@@ -26,6 +41,7 @@ const createRestaurant = async (req, res) => {
 
     res.status(201).json(restaurant);
   } catch (error) {
+    if (req.file?.path) await safeDestroyImage(req.file.path);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -33,26 +49,30 @@ const createRestaurant = async (req, res) => {
 const getRestaurants = async (req, res) => {
   try {
     const { search, cuisine, isOpen, page = 1, limit = 20 } = req.query;
-    const filter = {};
+
+    const filter = { isActive: true };
 
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } },
-        { cuisine: { $regex: search, $options: "i" } },
+        { cuisine: { $elemMatch: { $regex: search, $options: "i" } } },
       ];
     }
     if (cuisine) filter.cuisine = { $in: [cuisine] };
     if (isOpen !== undefined) filter.isOpen = isOpen === "true";
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const parsedPage = Math.max(1, parseInt(page) || 1);
+    const parsedLimit = Math.min(100, Math.max(1, parseInt(limit) || 20));
+    const skip = (parsedPage - 1) * parsedLimit;
+
     const total = await Restaurant.countDocuments(filter);
     const restaurants = await Restaurant.find(filter)
       .sort({ rating: -1, createdAt: -1 })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(parsedLimit);
 
-    res.json({ restaurants, total, page: parseInt(page), pages: Math.ceil(total / parseInt(limit)) });
+    res.json({ restaurants, total, page: parsedPage, pages: Math.ceil(total / parsedLimit) });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -61,7 +81,7 @@ const getRestaurants = async (req, res) => {
 const getRestaurant = async (req, res) => {
   try {
     const restaurant = await Restaurant.findById(req.params.id);
-    if (!restaurant) {
+    if (!restaurant || !restaurant.isActive) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
     res.json(restaurant);
@@ -77,11 +97,22 @@ const updateRestaurant = async (req, res) => {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    const fields = ["name", "description", "address", "isActive", "isOpen",
-                    "deliveryTime", "deliveryFee", "minOrder", "openingHours", "phone"];
-    fields.forEach((f) => {
+    const stringFields = ["name", "description", "address", "deliveryTime", "openingHours", "phone"];
+    stringFields.forEach((f) => {
       if (req.body[f] !== undefined) restaurant[f] = req.body[f];
     });
+
+    const numberFields = ["deliveryFee", "minOrder"];
+    numberFields.forEach((f) => {
+      if (req.body[f] !== undefined) restaurant[f] = parseFloat(req.body[f]);
+    });
+
+    if (req.body.isActive !== undefined) {
+      restaurant.isActive = req.body.isActive === "true" || req.body.isActive === true;
+    }
+    if (req.body.isOpen !== undefined) {
+      restaurant.isOpen = req.body.isOpen === "true" || req.body.isOpen === true;
+    }
 
     if (req.body.cuisine) {
       restaurant.cuisine = Array.isArray(req.body.cuisine)
@@ -95,10 +126,7 @@ const updateRestaurant = async (req, res) => {
     }
 
     if (req.file) {
-      if (restaurant.image) {
-        const publicId = restaurant.image.split("/").slice(-2).join("/").split(".")[0];
-        try { await cloudinary.uploader.destroy(publicId); } catch (e) {}
-      }
+      await safeDestroyImage(restaurant.image);
       restaurant.image = req.file.path;
     }
 
@@ -115,19 +143,16 @@ const deleteRestaurant = async (req, res) => {
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
-    if (restaurant.image) {
-      const publicId = restaurant.image.split("/").slice(-2).join("/").split(".")[0];
-      try { await cloudinary.uploader.destroy(publicId); } catch (e) {}
-    }
 
+    await safeDestroyImage(restaurant.image);
+    await FoodItem.deleteMany({ restaurantId: restaurant._id });
     await Restaurant.findByIdAndDelete(req.params.id);
-    res.json({ message: "Restaurant deleted successfully" });
+
+    res.json({ message: "Restaurant and its menu items deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-module.exports = { createRestaurant, getRestaurants, getRestaurant, updateRestaurant, deleteRestaurant };
 
 module.exports = {
   createRestaurant,

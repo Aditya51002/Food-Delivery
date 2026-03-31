@@ -15,7 +15,6 @@ const reviewSchema = new mongoose.Schema(
     targetId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      refPath: "targetType",
     },
     orderId: {
       type: mongoose.Schema.Types.ObjectId,

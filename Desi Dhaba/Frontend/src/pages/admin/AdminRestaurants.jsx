@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../../utils/api";
 import toast from "react-hot-toast";
-import { FiPlus, FiEdit2, FiTrash2, FiX } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiCheckCircle } from "react-icons/fi";
+import { MdOutlineRestaurant } from "react-icons/md";
 
 const AdminRestaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -63,12 +64,12 @@ const AdminRestaurants = () => {
         await API.put(`/restaurants/${editId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast.success("Restaurant updated!");
+        toast.success("Venue updated!", { style: { background: '#18181b', color: '#fff' }});
       } else {
         await API.post("/restaurants", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast.success("Restaurant created!");
+        toast.success("Venue created!", { style: { background: '#18181b', color: '#fff' }});
       }
       resetForm();
       fetchRestaurants();
@@ -80,103 +81,115 @@ const AdminRestaurants = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this restaurant?")) return;
+    if (!window.confirm("Are you sure you want to remove this venue?")) return;
     try {
       await API.delete(`/restaurants/${id}`);
-      toast.success("Restaurant deleted!");
+      toast.success("Venue removed!", { style: { background: '#18181b', color: '#fff' }});
       fetchRestaurants();
     } catch {
-      toast.error("Failed to delete restaurant");
+      toast.error("Failed to remove venue");
     }
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-orange-500" />
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-zinc-800 border-t-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.5)]" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Restaurants</h1>
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto min-h-[80vh]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 border-b border-white/10 pb-5">
+        <div>
+          <h1 className="text-3xl font-black text-white tracking-tight">Partner Venues</h1>
+          <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-1">Manage network</p>
+        </div>
         <button
           onClick={() => {
             resetForm();
             setShowForm(true);
           }}
-          className="flex items-center space-x-2 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition"
+          className="btn-primary px-6 py-2.5 flex items-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
         >
           <FiPlus size={18} />
-          <span>Add Restaurant</span>
+          <span>Add Venue</span>
         </button>
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">{editId ? "Edit Restaurant" : "Add Restaurant"}</h2>
-              <button onClick={resetForm} className="text-gray-400 hover:text-gray-600">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="glass-panel max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 rounded-3xl border border-white/10 shadow-2xl relative">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-rose-500/10 rounded-full blur-[60px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
+            
+            <div className="flex justify-between items-center mb-6 relative z-10">
+              <h2 className="text-2xl font-black text-white">{editId ? "Edit Venue" : "New Venue"}</h2>
+              <button onClick={resetForm} className="text-zinc-500 hover:text-white bg-zinc-900 rounded-full p-2 border border-white/5 transition hover:bg-rose-500/20 hover:border-rose-500/50">
                 <FiX size={20} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+            
+            <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest">Name <span className="text-rose-500">*</span></label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   required
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                  className="glass-input"
+                  placeholder="e.g. Spice & Flames"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none resize-none"
+                  className="glass-input resize-none"
+                  placeholder="A short tagline or background..."
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest">Address <span className="text-rose-500">*</span></label>
                 <input
                   type="text"
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
                   required
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                  className="glass-input"
+                  placeholder="Full physical address"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest">Cover Image</label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => setImageFile(e.target.files[0])}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                  className="w-full text-sm text-zinc-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700 cursor-pointer"
                 />
               </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={form.isActive}
-                  onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                  className="rounded text-orange-600 focus:ring-orange-500"
-                />
-                <label className="text-sm text-gray-700">Active</label>
+              <div className="flex items-center space-x-3 bg-zinc-900/50 p-4 rounded-xl border border-white/5">
+                <div 
+                  onClick={() => setForm({ ...form, isActive: !form.isActive })}
+                  className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-300 flex items-center ${form.isActive ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-zinc-700'}`}
+                >
+                  <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 shadow-sm ${form.isActive ? 'translate-x-6' : 'translate-x-0'}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Publicly Visible</p>
+                  <p className="text-xs text-zinc-500">Allow users to see & order from here</p>
+                </div>
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-orange-600 text-white py-2.5 rounded-lg font-medium hover:bg-orange-700 transition disabled:opacity-50"
+                className="w-full btn-primary py-4 text-base tracking-widest uppercase mt-4"
               >
-                {submitting ? "Saving..." : editId ? "Update Restaurant" : "Create Restaurant"}
+                {submitting ? "Saving Data..." : editId ? "Update Venue Profile" : "Register Venue"}
               </button>
             </form>
           </div>
@@ -184,62 +197,72 @@ const AdminRestaurants = () => {
       )}
 
       {restaurants.length === 0 ? (
-        <p className="text-gray-500 text-center py-12">No restaurants yet. Add one!</p>
+        <div className="glass-panel text-center py-20 rounded-3xl border border-white/5">
+          <MdOutlineRestaurant size={48} className="mx-auto text-zinc-700 mb-4" />
+          <p className="text-zinc-500 font-bold text-lg">No partner venues acquired yet.</p>
+        </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="glass-card rounded-3xl overflow-hidden border border-white/5">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
-                <tr className="text-left text-gray-500">
-                  <th className="px-6 py-3 font-medium">Image</th>
-                  <th className="px-6 py-3 font-medium">Name</th>
-                  <th className="px-6 py-3 font-medium">Address</th>
-                  <th className="px-6 py-3 font-medium">Status</th>
-                  <th className="px-6 py-3 font-medium">Actions</th>
+            <table className="w-full text-sm text-left">
+              <thead className="bg-zinc-950/80 text-xs uppercase tracking-widest text-zinc-500 font-bold border-b border-white/5">
+                <tr>
+                  <th className="px-6 py-5">Partner</th>
+                  <th className="px-6 py-5">Location</th>
+                  <th className="px-6 py-5 text-center">Status</th>
+                  <th className="px-6 py-5 text-right">Admin Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/5">
                 {restaurants.map((r) => (
-                  <tr key={r._id} className="border-t hover:bg-gray-50">
-                    <td className="px-6 py-3">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-200">
-                        {r.image ? (
-                          <img src={r.image} alt={r.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xl">🏪</div>
-                        )}
+                  <tr key={r._id} className="hover:bg-zinc-800/30 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0 border border-white/5 shadow-inner">
+                          {r.image ? (
+                            <img src={r.image} alt={r.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-zinc-600">
+                              <MdOutlineRestaurant size={24} />
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-bold text-white text-base leading-tight group-hover:text-rose-400 transition-colors">{r.name}</p>
+                          <p className="text-xs text-zinc-500 font-medium mt-1 truncate max-w-[200px]">{r.description || "No description provided."}</p>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-3 font-medium text-gray-800">{r.name}</td>
-                    <td className="px-6 py-3 text-gray-500 max-w-[200px] truncate">{r.address}</td>
-                    <td className="px-6 py-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          r.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {r.isActive ? "Active" : "Inactive"}
-                      </span>
+                    <td className="px-6 py-4 text-zinc-400 max-w-[250px]">
+                      <p className="truncate font-medium">{r.address}</p>
                     </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center space-x-2">
+                    <td className="px-6 py-4 text-center">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-zinc-900 border-white/5">
+                        <div className={`w-2 h-2 rounded-full ${r.isActive ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-zinc-600'}`} />
+                        <span className={r.isActive ? "text-emerald-400" : "text-zinc-500"}>{r.isActive ? "Active" : "Hidden"}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end space-x-3">
                         <Link
                           to={`/admin/restaurants/${r._id}/foods`}
-                          className="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 bg-blue-50 rounded"
+                          className="text-xs font-bold px-4 py-2 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl border border-indigo-500/20 transition-all shadow-sm uppercase tracking-wider"
                         >
                           Menu
                         </Link>
                         <button
                           onClick={() => handleEdit(r)}
-                          className="text-orange-600 hover:text-orange-800 p-1"
+                          className="w-8 h-8 rounded-xl bg-zinc-800 text-zinc-400 flex items-center justify-center hover:bg-zinc-700 hover:text-white transition-colors border border-white/5"
+                          title="Edit"
                         >
-                          <FiEdit2 size={16} />
+                          <FiEdit2 size={14} />
                         </button>
                         <button
                           onClick={() => handleDelete(r._id)}
-                          className="text-red-500 hover:text-red-700 p-1"
+                          className="w-8 h-8 rounded-xl bg-zinc-800 text-zinc-400 flex items-center justify-center hover:bg-red-500/20 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30"
+                          title="Delete"
                         >
-                          <FiTrash2 size={16} />
+                          <FiTrash2 size={14} />
                         </button>
                       </div>
                     </td>

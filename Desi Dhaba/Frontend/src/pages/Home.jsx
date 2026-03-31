@@ -16,14 +16,14 @@ import {
 } from "react-icons/md";
 
 const CATEGORY_META = {
-  Pizza:       { Icon: MdOutlineLocalPizza,    color: "bg-red-100 text-red-700",    iconColor: "#b91c1c" },
-  Burgers:     { Icon: MdOutlineFastfood,       color: "bg-yellow-100 text-yellow-700", iconColor: "#b45309" },
-  "Fast Food": { Icon: MdOutlineFastfood,       color: "bg-orange-100 text-orange-700", iconColor: "#c2410c" },
-  Bakery:      { Icon: MdOutlineCake,           color: "bg-pink-100 text-pink-700",  iconColor: "#be185d" },
-  Indian:      { Icon: MdOutlineRiceBowl,       color: "bg-amber-100 text-amber-700", iconColor: "#b45309" },
-  Drinks:      { Icon: MdOutlineLocalDrink,     color: "bg-blue-100 text-blue-700",  iconColor: "#1d4ed8" },
+  Pizza:       { Icon: MdOutlineLocalPizza,    color: "bg-red-500/20 text-red-400 border border-red-500/30",    iconColor: "#f87171" },
+  Burgers:     { Icon: MdOutlineFastfood,       color: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30", iconColor: "#facc15" },
+  "Fast Food": { Icon: MdOutlineFastfood,       color: "bg-orange-500/20 text-orange-400 border border-orange-500/30", iconColor: "#fb923c" },
+  Bakery:      { Icon: MdOutlineCake,           color: "bg-pink-500/20 text-pink-400 border border-pink-500/30",  iconColor: "#f472b6" },
+  Indian:      { Icon: MdOutlineRiceBowl,       color: "bg-amber-500/20 text-amber-400 border border-amber-500/30", iconColor: "#fbbf24" },
+  Drinks:      { Icon: MdOutlineLocalDrink,     color: "bg-blue-500/20 text-blue-400 border border-blue-500/30",  iconColor: "#60a5fa" },
 };
-const DEFAULT_META = { Icon: MdOutlineRestaurant, color: "bg-gray-100 text-gray-700", iconColor: "#6b7280" };
+const DEFAULT_META = { Icon: MdOutlineRestaurant, color: "bg-zinc-700/50 text-zinc-300 border border-zinc-600", iconColor: "#a1a1aa" };
 
 const MOODS = [
   {
@@ -31,8 +31,8 @@ const MOODS = [
     label: "Feelin' Spicy",
     Icon: MdOutlineLocalFireDepartment,
     categories: ["Indian", "Fast Food"],
-    from: "#ef4444",
-    to: "#f97316",
+    from: "#f43f5e",
+    to: "#fb923c",
     desc: "Bold & fiery flavours",
   },
   {
@@ -67,8 +67,8 @@ const MOODS = [
     label: "Desi Comfort",
     Icon: MdOutlineRiceBowl,
     categories: ["Indian"],
-    from: "#d97706",
-    to: "#f59e0b",
+    from: "#f59e0b",
+    to: "#fcd34d",
     desc: "Warm soul food",
   },
   {
@@ -83,61 +83,61 @@ const MOODS = [
 ];
 
 const StarRating = ({ rating, count }) => (
-  <div className="flex items-center space-x-0.5">
+  <div className="flex items-center space-x-0.5 shadow-[0_0_10px_rgba(250,204,21,0.2)] rounded-full px-1.5 py-0.5 bg-zinc-900/50">
     {[1,2,3,4,5].map((i) => (
       <FiStar key={i} size={11}
-        className={i <= Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} />
+        className={i <= Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-zinc-600"} />
     ))}
-    <span className="ml-1 text-xs text-gray-500 font-medium">{rating?.toFixed(1)}</span>
-    {count > 0 && <span className="text-[10px] text-gray-400 ml-0.5">({count})</span>}
+    <span className="ml-1.5 text-[11px] text-zinc-200 font-bold">{rating?.toFixed(1)}</span>
+    {count > 0 && <span className="text-[10px] text-zinc-500 ml-1">({count})</span>}
   </div>
 );
 
 const RestaurantCard = ({ restaurant }) => (
   <Link
     to={`/restaurant/${restaurant._id}`}
-    className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300 overflow-hidden group block"
+    className="glass-card overflow-hidden group block"
   >
-    <div className="h-40 bg-gray-100 overflow-hidden relative">
+    <div className="h-44 bg-zinc-800 overflow-hidden relative border-b border-white/5">
       {restaurant.image ? (
-        <img src={restaurant.image} alt={restaurant.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        <img src={restaurant.image} alt={restaurant.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-amber-100">
-          <MdOutlineRestaurant size={52} className="text-orange-300" />
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-900/40 to-zinc-900">
+          <MdOutlineRestaurant size={52} className="text-zinc-600" />
         </div>
       )}
       {!restaurant.isOpen && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold">Closed</span>
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
+          <span className="bg-red-500/90 text-white text-xs px-3 py-1 rounded-full font-bold shadow-[0_0_15px_rgba(239,68,68,0.5)] tracking-widest uppercase">Closed</span>
         </div>
       )}
     </div>
     <div className="p-4">
-      <div className="flex justify-between items-start mb-1">
-        <h3 className="font-bold text-gray-800 text-base leading-tight truncate pr-2">{restaurant.name}</h3>
-        <div className="flex items-center space-x-0.5 flex-shrink-0">
+      <div className="flex justify-between items-start mb-1.5">
+        <h3 className="font-bold text-zinc-100 text-lg leading-tight truncate pr-2 group-hover:text-rose-400 transition-colors">{restaurant.name}</h3>
+        <div className="flex items-center space-x-0.5 flex-shrink-0 bg-yellow-400/10 px-1.5 py-0.5 rounded-md border border-yellow-400/20">
           <FiStar size={12} className="text-yellow-400 fill-yellow-400" />
-          <span className="text-xs font-semibold text-gray-700">{restaurant.rating?.toFixed(1) || "4.0"}</span>
+          <span className="text-xs font-bold text-yellow-400">{restaurant.rating?.toFixed(1) || "4.0"}</span>
         </div>
       </div>
       {restaurant.cuisine?.length > 0 && (
-        <p className="text-xs text-gray-400 mb-2 truncate">{restaurant.cuisine.join(" • ")}</p>
+        <p className="text-xs text-zinc-400 mb-3 truncate font-medium">{restaurant.cuisine.join(" • ")}</p>
       )}
-      <div className="flex items-center justify-between text-xs text-gray-500">
-        <div className="flex items-center space-x-1"><FiClock size={11} /><span>{restaurant.deliveryTime || "30-40 min"}</span></div>
-        <div className="flex items-center space-x-1"><FiTruck size={11} /><span>{restaurant.deliveryFee > 0 ? `₹${restaurant.deliveryFee}` : "Free"}</span></div>
+      <div className="flex items-center justify-between text-xs text-zinc-400 border-t border-white/5 pt-3">
+        <div className="flex items-center space-x-1.5"><FiClock size={12} className="text-rose-400" /><span>{restaurant.deliveryTime || "30-40 min"}</span></div>
+        <div className="flex items-center space-x-1.5"><FiTruck size={12} className="text-emerald-400" /><span>{restaurant.deliveryFee > 0 ? `₹${restaurant.deliveryFee}` : "Free Delivery"}</span></div>
       </div>
     </div>
   </Link>
 );
 
 const SkeletonCard = () => (
-  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
-    <div className="h-44 bg-gray-200" />
-    <div className="p-4 space-y-2">
-      <div className="h-3 bg-gray-200 rounded w-3/4" />
-      <div className="h-3 bg-gray-200 rounded w-1/2" />
-      <div className="h-8 bg-gray-200 rounded-xl mt-3" />
+  <div className="glass-card overflow-hidden animate-pulse">
+    <div className="h-44 bg-zinc-800/80" />
+    <div className="p-4 space-y-3">
+      <div className="h-4 bg-zinc-700/50 rounded w-3/4" />
+      <div className="h-3 bg-zinc-700/50 rounded w-1/2" />
+      <div className="h-10 bg-zinc-800 rounded-xl mt-4" />
     </div>
   </div>
 );
@@ -146,50 +146,56 @@ const FoodCard = ({ food, onAddToCart, addingId }) => {
   const meta = CATEGORY_META[food.category] || DEFAULT_META;
   const { Icon: CatIcon, iconColor } = meta;
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300 overflow-hidden flex flex-col group">
-      <div className="h-44 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center overflow-hidden relative">
+    <div className="glass-card overflow-hidden flex flex-col group relative">
+      <div className="h-48 bg-zinc-800/50 flex items-center justify-center overflow-hidden relative border-b border-white/5">
         {food.image ? (
-          <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100" />
         ) : (
-          <CatIcon size={72} color={iconColor} className="opacity-50" />
+          <CatIcon size={72} color={iconColor} className="opacity-30" />
         )}
-        <div className="absolute top-2.5 left-2.5 flex flex-col space-y-1">
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${meta.color}`}>{food.category}</span>
+        <div className="absolute top-3 left-3 flex flex-col space-y-1.5 z-10">
+          <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-1.5 rounded-lg backdrop-blur-md shadow-lg ${meta.color}`}>{food.category}</span>
           {food.isBestSeller && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-yellow-900">🏆 Best Seller</span>
+            <span className="text-[10px] font-black tracking-wider uppercase px-2.5 py-1.5 rounded-lg bg-yellow-400/90 text-yellow-900 shadow-[0_0_15px_rgba(250,204,21,0.4)]">🏆 Best Seller</span>
           )}
         </div>
-        <div className="absolute top-2.5 right-2.5">
-          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${food.isVeg !== false ? "border-green-600" : "border-red-600"}`}>
-            <div className={`w-2.5 h-2.5 rounded-full ${food.isVeg !== false ? "bg-green-600" : "bg-red-600"}`} />
+        <div className="absolute top-3 right-3 z-10">
+          <div className={`w-5 h-5 rounded border-2 backdrop-blur-md flex items-center justify-center ${food.isVeg !== false ? "border-emerald-500 bg-emerald-500/20" : "border-red-500 bg-red-500/20"}`}>
+            <div className={`w-2.5 h-2.5 rounded-full ${food.isVeg !== false ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" : "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]"}`} />
           </div>
         </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent opacity-80" />
       </div>
-      <div className="p-3.5 flex flex-col flex-1">
-        <h3 className="font-bold text-gray-800 text-sm mb-0.5 leading-tight line-clamp-1">{food.name}</h3>
+      
+      <div className="p-4 flex flex-col flex-1 relative z-10 -mt-2">
+        <h3 className="font-bold text-zinc-100 text-[15px] mb-1 leading-tight line-clamp-1">{food.name}</h3>
         {food.description && (
-          <p className="text-gray-400 text-[11px] mb-1.5 line-clamp-2 leading-relaxed">{food.description}</p>
+          <p className="text-zinc-400 text-xs mb-3 line-clamp-2 leading-relaxed">{food.description}</p>
         )}
-        <StarRating rating={food.rating || 4.0} count={food.numRatings} />
-        {food.preparationTime && (
-          <div className="flex items-center space-x-1 mt-1 text-[11px] text-gray-400">
-            <FiClock size={11} /><span>{food.preparationTime}</span>
-          </div>
-        )}
-        <div className="flex items-center justify-between mt-auto pt-3">
-          <div>
-            <span className="text-lg font-extrabold text-orange-600">₹{food.price}</span>
+        
+        <div className="flex items-center justify-between mb-3 mt-auto pt-2">
+          <StarRating rating={food.rating || 4.0} count={food.numRatings} />
+          {food.preparationTime && (
+            <div className="flex items-center space-x-1 text-[11px] text-zinc-500 font-medium bg-zinc-800 px-2 py-1 rounded-md border border-white/5">
+              <FiClock size={11} className="text-zinc-400" /><span>{food.preparationTime}</span>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex items-center justify-between border-t border-white/5 pt-3">
+          <div className="flex items-baseline">
+            <span className="text-xl font-black text-white group-hover:text-rose-400 transition-colors">₹{food.price}</span>
             {food.originalPrice && food.originalPrice > food.price && (
-              <span className="text-xs text-gray-400 line-through ml-1.5">₹{food.originalPrice}</span>
+              <span className="text-xs text-zinc-500 line-through ml-2 font-medium">₹{food.originalPrice}</span>
             )}
           </div>
           <button
             onClick={() => onAddToCart(food._id)}
             disabled={addingId === food._id}
-            className="flex items-center space-x-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold px-3 py-2 rounded-xl transition disabled:opacity-60 active:scale-95"
+            className="btn-primary flex items-center space-x-1.5 px-4 py-2"
           >
-            <FiShoppingCart size={13} />
-            <span>{addingId === food._id ? "Adding…" : "Add"}</span>
+            <FiShoppingCart size={14} />
+            <span className="text-sm">{addingId === food._id ? "..." : "Add"}</span>
           </button>
         </div>
       </div>
@@ -199,39 +205,32 @@ const FoodCard = ({ food, onAddToCart, addingId }) => {
 
 const CraveCompass = ({ activeMood, onMoodSelect }) => {
   return (
-    <section
-      className="relative rounded-3xl overflow-hidden mb-8"
-      style={{ background: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)" }}
-    >
-      <div
-        className="absolute -top-16 -left-16 w-64 h-64 rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, #f97316, transparent)" }}
+    <section className="relative glass-panel rounded-3xl overflow-hidden mb-10 border border-white/10">
+      <div 
+        className="absolute inset-0 opacity-40 pointer-events-none"
+        style={{ background: "radial-gradient(circle at top left, rgba(244,63,94,0.15), transparent 60%), radial-gradient(circle at bottom right, rgba(99,102,241,0.15), transparent 60%)" }}
       />
-      <div
-        className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, #ec4899, transparent)" }}
-      />
-
+      
       <div className="relative z-10 px-6 py-8 md:px-10">
-        <div className="flex items-center space-x-3 mb-2">
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
-            <FiZap size={18} className="text-yellow-300" />
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-800/80 backdrop-blur-md border border-zinc-700 shadow-[0_0_20px_rgba(250,204,21,0.15)]">
+            <FiZap size={24} className="text-yellow-400 filter drop-shadow-[0_0_5px_rgba(250,204,21,0.8)]" />
           </div>
           <div>
-            <h2 className="text-white text-xl font-extrabold tracking-tight">Crave Compass</h2>
-            <p className="text-white/50 text-xs font-medium">{"What's your vibe right now?"}</p>
+            <h2 className="text-white text-2xl font-black tracking-tight">Crave Compass</h2>
+            <p className="text-zinc-400 text-sm font-medium mt-0.5">{"What's your vibe right now?"}</p>
           </div>
           {activeMood && (
             <button
               onClick={() => onMoodSelect(null)}
-              className="ml-auto text-xs text-white/40 hover:text-white/80 border border-white/20 hover:border-white/40 px-3 py-1 rounded-full transition"
+              className="ml-auto text-xs text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 bg-zinc-800 px-4 py-1.5 rounded-full transition"
             >
-              Clear
+              Reset Guide
             </button>
           )}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {MOODS.map((mood) => {
             const isActive = activeMood?.id === mood.id;
             const MoodIcon = mood.Icon;
@@ -239,47 +238,25 @@ const CraveCompass = ({ activeMood, onMoodSelect }) => {
               <button
                 key={mood.id}
                 onClick={() => onMoodSelect(mood)}
-                className="group relative rounded-2xl p-4 text-left focus:outline-none"
+                className={`group relative rounded-2xl p-5 text-left focus:outline-none backdrop-blur-md transition-all duration-300 ${
+                  isActive ? "border-transparent" : "border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-800/60 hover:border-zinc-700 hover:-translate-y-1"
+                }`}
                 style={{
-                  background: isActive
-                    ? `linear-gradient(135deg, ${mood.from}, ${mood.to})`
-                    : "rgba(255,255,255,0.06)",
-                  border: isActive
-                    ? `2px solid ${mood.from}`
-                    : "2px solid rgba(255,255,255,0.12)",
-                  boxShadow: isActive ? `0 0 28px ${mood.from}66` : "none",
-                  transform: isActive ? "scale(1.05)" : "scale(1)",
-                  transition: "all 0.25s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.12)";
-                    e.currentTarget.style.border = `2px solid ${mood.from}90`;
-                    e.currentTarget.style.transform = "scale(1.03)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-                    e.currentTarget.style.border = "2px solid rgba(255,255,255,0.12)";
-                    e.currentTarget.style.transform = "scale(1)";
-                  }
+                  background: isActive ? `linear-gradient(135deg, ${mood.from}CC, ${mood.to}CC)` : "",
+                  boxShadow: isActive ? `0 10px 30px -10px ${mood.from}` : "none",
                 }}
               >
-                {isActive && (
-                  <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-white animate-ping opacity-60" />
-                )}
-                <div className="mb-2 transition-transform duration-200 group-hover:scale-125">
+                <div className={`mb-3 transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
                   <MoodIcon
-                    size={32}
+                    size={36}
                     color={isActive ? "#ffffff" : mood.from}
-                    style={{ filter: isActive ? "none" : `drop-shadow(0 0 6px ${mood.from}88)` }}
+                    style={{ filter: isActive ? "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" : `drop-shadow(0 0 8px ${mood.from}66)` }}
                   />
                 </div>
-                <p className={`text-xs font-bold leading-tight mb-0.5 ${isActive ? "text-white" : "text-white/80"}`}>
+                <p className={`text-sm font-black leading-tight mb-1 ${isActive ? "text-white" : "text-zinc-200"}`}>
                   {mood.label}
                 </p>
-                <p className={`text-xs leading-tight ${isActive ? "text-white/80" : "text-white/40"}`}>
+                <p className={`text-xs leading-tight font-medium ${isActive ? "text-white/80" : "text-zinc-500"}`}>
                   {mood.desc}
                 </p>
               </button>
@@ -288,17 +265,13 @@ const CraveCompass = ({ activeMood, onMoodSelect }) => {
         </div>
 
         {activeMood && (
-          <div
-            className="mt-4 inline-flex items-center space-x-2 rounded-full px-4 py-1.5"
-            style={{
-              background: `linear-gradient(90deg, ${activeMood.from}33, ${activeMood.to}33)`,
-              border: `1px solid ${activeMood.from}66`,
-            }}
-          >
-            <activeMood.Icon size={14} color={activeMood.from} />
-            <span className="text-white/90 text-xs font-semibold">
-              Showing: {activeMood.categories.join(" / ")}
-            </span>
+          <div className="mt-6 flex justify-end">
+            <div className="inline-flex items-center space-x-2 rounded-full px-5 py-2 bg-zinc-900/80 border border-zinc-700 backdrop-blur-md shadow-lg">
+              <activeMood.Icon size={16} color={activeMood.from} className="animate-pulse" />
+              <span className="text-zinc-300 text-xs font-bold tracking-wide">
+                Refining to: <span className="text-white">{activeMood.categories.join(" & ")}</span>
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -381,42 +354,46 @@ const Home = () => {
     : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #c2410c 0%, #ea580c 40%, #f97316 70%, #fb923c 100%)" }}>
-        <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-white/10" />
-        <div className="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-white/10" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-20 relative z-10">
+    <div className="min-h-screen">
+      <div className="relative overflow-hidden pt-12 rounded-b-[3rem] shadow-2xl mb-12 border-b border-white/5 mx-2" style={{ background: "linear-gradient(135deg, #18181b 0%, #09090b 100%)" }}>
+        {/* Subtle glowing orbs in bg */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] -translate-y-1/2 translate-x-1/3 rounded-full bg-rose-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] translate-y-1/3 -translate-x-1/4 rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative z-10">
           <div className="max-w-2xl">
-            <span className="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 tracking-widest uppercase border border-white/30">
-              🚀 Fast • Fresh • Delicious
+            <span className="inline-block bg-zinc-900/80 backdrop-blur-md text-rose-400 text-xs font-black px-4 py-1.5 rounded-full mb-6 tracking-[0.2em] border border-rose-500/30 uppercase shadow-[0_0_20px_rgba(244,63,94,0.15)]">
+              🚀 Fast • Fresh • Premium
             </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
-              Authentic Desi<br />
-              Flavours, <span className="text-yellow-300">Delivered.</span>
+            <h1 className="text-5xl md:text-7xl font-black text-white leading-[1.1] mb-6">
+              Midnight <br />
+              Gourmet.
             </h1>
-            <p className="text-white/80 text-base md:text-lg mb-8 leading-relaxed">
-              From crispy street bites to rich Indian curries — order from the best restaurants and get it delivered fast.
+            <p className="text-zinc-400 text-lg md:text-xl font-medium mb-10 leading-relaxed max-w-xl">
+              Elevate your dining with hyper-premium street eats and rich culinary delights. Delivered fast.
             </p>
-            <div className="flex items-center bg-white rounded-2xl shadow-2xl overflow-hidden max-w-lg">
-              <div className="pl-4 text-orange-500"><FiMapPin size={18} /></div>
+            
+            <div className="flex items-center glass-card overflow-hidden max-w-lg rounded-2xl p-1.5 focus-within:ring-2 focus-within:ring-rose-500/50 transition-all shadow-2xl">
+              <div className="pl-4 text-zinc-400"><FiSearch size={20} /></div>
               <input
                 value={restaurantSearch}
                 onChange={(e) => { setRestaurantSearch(e.target.value); setActiveTab("restaurants"); }}
-                placeholder="Search restaurants, cuisines..."
-                className="flex-1 px-3 py-3.5 text-gray-800 text-sm outline-none placeholder:text-gray-400"
+                placeholder="Search premium restaurants, exquisite dishes..."
+                className="flex-1 px-4 py-3 bg-transparent text-white text-sm outline-none placeholder:text-zinc-500 font-medium"
               />
               <button
                 onClick={() => setActiveTab("restaurants")}
-                className="m-1.5 bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl font-semibold flex items-center space-x-2 transition text-sm"
+                className="btn-primary py-3 px-6 rounded-xl flex items-center space-x-2 text-sm"
               >
-                <FiSearch size={16} /><span>Search</span>
+                <span>Discover</span>
               </button>
             </div>
-            <div className="flex items-center space-x-6 mt-8 text-white/70 text-sm">
-              {[{ value: `${restaurants.length}+`, label: "Restaurants" }, { value: `${foods.length}+`, label: "Menu Items" }, { value: "30 min", label: "Avg Delivery" }].map((s) => (
-                <div key={s.label} className="text-center">
-                  <p className="text-xl font-extrabold text-white">{s.value}</p>
-                  <p className="text-xs">{s.label}</p>
+            
+            <div className="flex items-center space-x-8 mt-12">
+              {[{ value: `${restaurants.length}+`, label: "Curated Venues" }, { value: `${foods.length}+`, label: "Exquisite Items" }, { value: "30m", label: "Lightning Delivery" }].map((s) => (
+                <div key={s.label}>
+                  <p className="text-2xl font-black text-white tracking-tight">{s.value}</p>
+                  <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mt-1">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -424,47 +401,41 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-8">
-        <div className="flex items-center space-x-1 bg-gray-200 p-1 rounded-xl w-fit mb-8">
-          {[{ key: "food", label: "🍛  Food Menu" }, { key: "restaurants", label: "🏪  Restaurants" }].map((tab) => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="flex items-center justify-center space-x-2 bg-zinc-900/50 border border-white/5 p-1.5 rounded-2xl w-fit mx-auto mb-12 backdrop-blur-sm shadow-xl">
+          {[{ key: "food", label: "Gourmet Menu" }, { key: "restaurants", label: "Premium Venues" }].map((tab) => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-                activeTab === tab.key ? "bg-white text-orange-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                activeTab === tab.key ? "bg-zinc-800 text-white shadow-md border border-zinc-700" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30"
               }`}
             >{tab.label}</button>
           ))}
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
-                <div className="h-44 bg-gray-200" />
-                <div className="p-4 space-y-2">
-                  <div className="h-3 bg-gray-200 rounded w-3/4" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
-                  <div className="h-8 bg-gray-200 rounded-xl mt-3" />
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : (
-          <>
+          <div className="animate-in fade-in duration-500">
             {activeTab === "restaurants" && (
               <>
-                <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-2xl font-extrabold text-gray-800">
-                    {restaurantSearch ? `Results for "${restaurantSearch}"` : "All Restaurants"}
-                  </h2>
-                  <span className="text-sm text-gray-400">{filteredRestaurants.length} found</span>
+                <div className="flex items-end justify-between mb-8 border-b border-white/10 pb-4">
+                  <div>
+                    <h2 className="text-3xl font-black text-white tracking-tight">
+                      {restaurantSearch ? `Results for "${restaurantSearch}"` : "Exclusive Partners"}
+                    </h2>
+                    <p className="text-zinc-400 text-sm mt-1">{filteredRestaurants.length} exceptional venues found</p>
+                  </div>
                 </div>
                 {filteredRestaurants.length === 0 ? (
-                  <div className="text-center py-20">
-                    <MdOutlineRestaurant size={64} className="mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-500">No restaurants found</h3>
+                  <div className="text-center py-24 glass-panel rounded-3xl">
+                    <MdOutlineRestaurant size={80} className="mx-auto text-zinc-700 mb-6 drop-shadow-2xl" />
+                    <h3 className="text-2xl font-bold text-zinc-300">No venues found</h3>
+                    <p className="text-zinc-500 mt-2">Try searching something else</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredRestaurants.map((r) => <RestaurantCard key={r._id} restaurant={r} />)}
                   </div>
                 )}
@@ -474,51 +445,59 @@ const Home = () => {
             {activeTab === "food" && (
               <>
                 <CraveCompass activeMood={activeMood} onMoodSelect={handleMoodSelect} />
+                
                 {!activeMood && (
-                  <div className="flex items-center space-x-2 overflow-x-auto pb-2 mb-8">
+                  <div className="flex items-center space-x-3 overflow-x-auto pb-4 mb-10 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
                     {["All", ...categories].map((cat) => {
                       const meta = CATEGORY_META[cat] || DEFAULT_META;
                       const CatIcon = meta.Icon;
                       const isActive = activeCategory === cat;
                       return (
-                        <button key={cat} onClick={() => { setActiveCategory(cat); setActiveMood(null); }}
-                          className={`flex items-center space-x-1.5 whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all ${
-                            isActive ? "bg-orange-600 border-orange-600 text-white shadow-md" : "bg-white border-gray-200 text-gray-600 hover:border-orange-300"
+                         <button key={cat} onClick={() => { setActiveCategory(cat); setActiveMood(null); }}
+                          className={`flex-shrink-0 flex items-center space-x-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
+                            isActive ? "bg-white text-zinc-900 shadow-[0_0_15px_rgba(255,255,255,0.2)]" : "bg-zinc-900/60 border border-white/10 text-zinc-400 hover:text-white hover:bg-zinc-800"
                           }`}
                         >
-                          {cat === "All" ? <MdOutlineRestaurant size={16} /> : <CatIcon size={16} color={isActive ? "#ffffff" : meta.iconColor} />}
+                          {cat === "All" ? <MdOutlineRestaurant size={18} /> : <CatIcon size={18} color={isActive ? "#18181b" : meta.iconColor} />}
                           <span>{cat}</span>
                         </button>
                       );
                     })}
                   </div>
                 )}
+                
                 {displayFoods.length === 0 ? (
-                  <p className="text-center text-gray-400 py-16 text-lg">No items found.</p>
+                  <div className="text-center py-24 glass-panel rounded-3xl">
+                    <p className="text-zinc-400 text-xl font-bold">No masterclasses found.</p>
+                  </div>
                 ) : grouped ? (
                   Object.entries(grouped).map(([cat, items]) => {
                     const meta = CATEGORY_META[cat] || DEFAULT_META;
                     return (
-                      <section key={cat} className="mb-12">
-                        <div className="flex items-center space-x-3 mb-5">
-                          <meta.Icon size={30} color={meta.iconColor} />
-                          <h2 className="text-2xl font-extrabold text-gray-800">{cat}</h2>
-                          <span className="text-sm text-gray-400">({items.length} items)</span>
+                      <section key={cat} className="mb-16">
+                        <div className="flex items-center space-x-4 mb-6 relative">
+                           <div className="w-12 h-12 rounded-2xl flex items-center justify-center glass-panel">
+                             <meta.Icon size={24} color={meta.iconColor} />
+                           </div>
+                           <div>
+                             <h2 className="text-3xl font-black text-white tracking-tight">{cat}</h2>
+                             <span className="text-xs text-zinc-500 font-bold uppercase tracking-wider">{items.length} Curated Items</span>
+                           </div>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                           {items.map((food) => <FoodCard key={food._id} food={food} onAddToCart={handleAddToCart} addingId={addingId} />)}
                         </div>
                       </section>
                     );
                   })
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {displayFoods.map((food) => <FoodCard key={food._id} food={food} onAddToCart={handleAddToCart} addingId={addingId} />)}
                   </div>
                 )}
               </>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
