@@ -237,13 +237,13 @@ const Profile = () => {
               <h2 className="text-2xl font-black text-white mb-8 tracking-tight">Delivery Addresses</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                {user.addresses?.length === 0 ? (
+                {user.savedAddresses?.length === 0 ? (
                   <div className="col-span-full py-12 text-center glass-panel rounded-2xl border border-white/5">
                     <FiMapPin size={32} className="mx-auto text-zinc-600 mb-3" />
                     <p className="text-zinc-500 font-medium">No saved addresses. Add one below for faster checkout.</p>
                   </div>
                 ) : (
-                  user.addresses?.map((addr) => (
+                  user.savedAddresses?.map((addr) => (
                     <div key={addr._id} className="glass-panel p-5 rounded-2xl border border-white/5 hover:border-emerald-500/30 transition group flex flex-col justify-between h-full relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-[30px] -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/10 transition-colors" />
                       <div className="flex items-start gap-4 mb-4 relative z-10">

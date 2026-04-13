@@ -247,7 +247,7 @@ const seed = async () => {
   console.log("───────────────────────────────\n");
 
   await mongoose.connection.close();
-  process.exit(0);``
+  process.exit(0);
 };
 
 seed().catch((err) => {

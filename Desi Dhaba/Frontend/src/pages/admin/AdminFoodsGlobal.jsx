@@ -103,7 +103,7 @@ const AdminFoodsGlobal = () => {
         });
         toast.success("Item updated!", { style: { background: '#18181b', color: '#fff' } });
       } else {
-        await API.post("/foods/create", fd, {
+        await API.post("/foods", fd, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success("Item created!", { style: { background: '#18181b', color: '#fff' } });

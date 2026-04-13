@@ -33,25 +33,25 @@ export const CartProvider = ({ children }) => {
   }, [user]);
 
   const addToCart = async (foodId, quantity) => {
-    const { data } = await API.post("/cart/add", { foodId, quantity });
+    const { data } = await API.post("/cart", { foodId, quantity });
     setCart(data);
     return data;
   };
 
   const incrementItem = async (foodId) => {
-    const { data } = await API.post("/cart/add", { foodId });
+    const { data } = await API.post("/cart", { foodId });
     setCart(data);
     return data;
   };
 
   const removeFromCart = async (foodId) => {
-    const { data } = await API.delete(`/cart/remove/${foodId}`);
+    const { data } = await API.delete(`/cart/${foodId}`);
     setCart(data);
     return data;
   };
 
   const clearCart = async () => {
-    await API.delete("/cart/clear");
+    await API.delete("/cart");
     setCart({ items: [], totalAmount: 0 });
   };
 

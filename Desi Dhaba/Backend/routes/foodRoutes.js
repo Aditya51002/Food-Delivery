@@ -15,11 +15,11 @@ const upload = multer({ storage });
 
 router.get("/", getAllFoods);
 router.get("/categories", getCategories);
-router.get("/:restaurantId", getFoodsByRestaurant);
+router.get("/restaurant/:restaurantId", getFoodsByRestaurant);
 
 router.post("/", protect, adminOnly, upload.single("image"), createGlobalFoodItem);
-router.post("/:restaurantId", protect, adminOnly, upload.single("image"), createFoodItem);
-router.put("/:id", protect, adminOnly, upload.single("image"), updateFoodItem);
-router.delete("/:id", protect, adminOnly, deleteFoodItem);
+router.post("/restaurant/:restaurantId", protect, adminOnly, upload.single("image"), createFoodItem);
+router.put("/item/:id", protect, adminOnly, upload.single("image"), updateFoodItem);
+router.delete("/item/:id", protect, adminOnly, deleteFoodItem);
 
 module.exports = router;

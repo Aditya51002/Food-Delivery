@@ -27,7 +27,7 @@ const AdminDashboard = () => {
         const [statsRes, ordersRes, revenueRes, statusRes] = await Promise.all([
           API.get("/analytics/stats"),
           API.get("/orders/admin?limit=5&page=1"),
-          API.get("/analytics/revenue-chart?days=7"),
+          API.get("/analytics/revenue?days=7"),
           API.get("/analytics/status-distribution")
         ]);
         

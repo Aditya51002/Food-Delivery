@@ -20,7 +20,7 @@ const AdminFoods = () => {
     try {
       const [resData, foodData] = await Promise.all([
         API.get(`/restaurants/${restaurantId}`),
-        API.get(`/foods/${restaurantId}`),
+        API.get(`/foods/restaurant/${restaurantId}`),
       ]);
       setRestaurant(resData.data);
       setFoods(foodData.data);
@@ -71,7 +71,7 @@ const AdminFoods = () => {
         });
         toast.success("Dish updated!", { style: { background: '#18181b', color: '#fff' }});
       } else {
-        await API.post(`/foods/${restaurantId}`, formData, {
+        await API.post(`/foods/restaurant/${restaurantId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success("Dish added to menu!", { style: { background: '#18181b', color: '#fff' }});

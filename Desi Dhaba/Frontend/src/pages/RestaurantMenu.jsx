@@ -275,7 +275,7 @@ const RestaurantMenu = () => {
       try {
         const [resRes, foodRes] = await Promise.all([
           API.get(`/restaurants/${id}`),
-          API.get(`/foods/${id}`),
+          API.get(`/foods/restaurant/${id}`),
         ]);
         setRestaurant(resRes.data);
         const avail = foodRes.data.filter((f) => f.isAvailable);

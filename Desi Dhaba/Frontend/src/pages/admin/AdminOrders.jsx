@@ -37,7 +37,7 @@ const AdminOrders = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await API.put(`/orders/${orderId}/status`, { status: newStatus });
+      await API.patch(`/orders/${orderId}/status`, { status: newStatus });
       toast.success(`Order status updated to ${newStatus}`, { style: { background: '#18181b', color: '#fff' }});
       fetchOrders();
     } catch {

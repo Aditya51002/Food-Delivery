@@ -81,11 +81,17 @@ export const AuthProvider = ({ children }) => {
     setUser((prev) => ({ ...prev, ...updatedUser }));
   };
 
+  const fetchUser = useCallback(async () => {
+    const { data } = await API.get("/auth/me");
+    setUser(data);
+    return data;
+  }, []);
+
   const isAdmin = user?.role === "admin";
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, updateUserState, loading, isAdmin }}
+      value={{ user, login, register, logout, updateUserState, fetchUser, loading, isAdmin }}
     >
       {children}
     </AuthContext.Provider>
