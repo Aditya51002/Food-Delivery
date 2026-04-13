@@ -1,4 +1,4 @@
-[# Desi Dhaba - Food Delivery Platform
+Desi Dhaba - Food Delivery Platform
 
 A full-stack food delivery web application built with the MERN stack.
 
