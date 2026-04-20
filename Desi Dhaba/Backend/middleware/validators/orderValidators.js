@@ -18,8 +18,7 @@ const placeOrderValidators = [
   body("couponCode")
     .optional()
     .trim()
-    .isAlphanumeric().withMessage("Coupon code must be alphanumeric")
-    .isLength({ max: 20 }).withMessage("Coupon code is too long"),
+    .matches(/^[A-Z0-9\-_]{2,20}$/).withMessage("Invalid coupon format — use uppercase letters, numbers, hyphens, or underscores")
 ];
 
 const cancelOrderValidators = [

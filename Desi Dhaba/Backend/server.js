@@ -6,12 +6,16 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const mongoose = require("mongoose");
+const mongoSanitize = require("express-mongo-sanitize");
 const connectDB = require("./config/db");
+const validateEnv = require("./config/validateEnv");
+const socket = require("./lib/socket");
 
 const http = require("http");
 const { Server } = require("socket.io");
 
 dotenv.config();
+validateEnv();
 
 const app = express();
 const server = http.createServer(app);
@@ -24,19 +28,19 @@ const io = new Server(server, {
   },
 });
 
-io.on("connection", (socket) => {
-  console.log(`⚡ Socket connected: ${socket.id}`);
+socket.init(io);
 
-  socket.on("join_order", (orderId) => {
-    socket.join(`order_${orderId}`);
+io.on("connection", (sock) => {
+  console.log(`⚡ Socket connected: ${sock.id}`);
+
+  sock.on("join_order", (orderId) => {
+    sock.join(`order_${orderId}`);
   });
 
-  socket.on("disconnect", () => {
-    console.log(`🔌 Socket disconnected: ${socket.id}`);
+  sock.on("disconnect", () => {
+    console.log(`🔌 Socket disconnected: ${sock.id}`);
   });
 });
-
-module.exports.io = io;
 
 connectDB().then(() => {
   ensureIndexes();
@@ -68,6 +72,13 @@ async function ensureIndexes() {
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
+
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
@@ -87,16 +98,11 @@ app.use("/api/v1/auth/login", authLimiter);
 app.use("/api/v1/auth/register", authLimiter);
 app.use("/api/v1/auth/refresh", authLimiter);
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
-  })
-);
-
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
+
+app.use(mongoSanitize());
 
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
@@ -153,3 +159,24 @@ server.listen(PORT, () => {
   console.log(`📡  API Base: http://localhost:${PORT}/api/v1`);
   console.log(`❤️   Health:  http://localhost:${PORT}/health`);
 });
+
+const shutdown = async (signal) => {
+  console.log(`\n[${signal}] Shutting down gracefully…`);
+  server.close(async () => {
+    try {
+      await mongoose.connection.close();
+      console.log("✅  MongoDB connection closed.");
+    } catch (err) {
+      console.error("Error closing MongoDB connection:", err.message);
+    }
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    console.error("⚠️  Forced shutdown after timeout.");
+    process.exit(1);
+  }, 10000);
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

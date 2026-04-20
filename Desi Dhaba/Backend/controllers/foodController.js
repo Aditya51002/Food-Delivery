@@ -3,10 +3,8 @@ const { cloudinary } = require("../config/cloudinary");
 
 const getCloudinaryPublicId = (url) => {
   if (!url || !url.includes("cloudinary")) return null;
-  const parts = url.split("/");
-  const filename = parts[parts.length - 1];
-  const folder = parts[parts.length - 2];
-  return `${folder}/${filename.split(".")[0]}`;
+  const match = url.match(/\/v\d+\/(.+)\.[a-z]+$/i);
+  return match ? match[1] : null;
 };
 
 const safeDestroyImage = async (url) => {
@@ -18,8 +16,11 @@ const safeDestroyImage = async (url) => {
 
 const getAllFoods = async (req, res) => {
   try {
-    const { category, search } = req.query;
-    const filter = { isAvailable: true };
+    const { category, search, showAll } = req.query;
+    const filter = {};
+
+    const isAdminOverride = showAll === "true" && req.user?.role === "admin";
+    if (!isAdminOverride) filter.isAvailable = true;
 
     if (category && category !== "All") filter.category = category;
     if (search && search.trim()) {

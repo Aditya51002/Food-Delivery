@@ -120,6 +120,10 @@ const placeOrder = async (req, res) => {
       );
     });
 
+    if (!createdOrder) {
+      return res.status(500).json({ message: "Order could not be created. Please try again." });
+    }
+
     res.status(201).json(createdOrder);
   } catch (error) {
     const statusCode = error.statusCode || 500;
@@ -220,6 +224,8 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+const { get: getIO } = require("../lib/socket");
+
 const updateOrderStatus = async (req, res) => {
   try {
     const { status, note } = req.body;
@@ -247,7 +253,7 @@ const updateOrderStatus = async (req, res) => {
 
     const populated = await Order.findById(order._id).populate("userId", "name email");
 
-    const io = require("../server").io;
+    const io = getIO();
     if (io) {
       io.to(`order_${populated._id}`).emit("order:updated", {
         status: populated.status,

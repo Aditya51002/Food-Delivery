@@ -1,10 +1,11 @@
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const Order = require("../models/Order");
+const { get: getIO } = require("../lib/socket");
 
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder_key_id",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "placeholder_secret_key",
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 const createRazorpayOrder = async (req, res) => {
@@ -30,7 +31,10 @@ const verifyPayment = async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body;
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !orderId) return res.status(400).json({ message: "Missing payment verification parameters" });
     const body = razorpay_order_id + "|" + razorpay_payment_id;
-    const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || "placeholder_secret_key").update(body.toString()).digest("hex");
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body.toString())
+      .digest("hex");
     if (expectedSignature !== razorpay_signature) return res.status(400).json({ message: "Invalid payment signature" });
     const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ message: "Order not found" });
@@ -40,7 +44,7 @@ const verifyPayment = async (req, res) => {
     order.status = "Confirmed";
     order.timeline.push({ status: "Confirmed", note: "Online payment successful" });
     await order.save();
-    const io = require("../server").io;
+    const io = getIO();
     if (io) {
       io.to(`order_${order._id}`).emit("order:updated", { status: order.status, paymentStatus: order.paymentStatus, timeline: order.timeline });
       io.to("admin_room").emit("admin:order_update", order);

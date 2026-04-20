@@ -51,7 +51,7 @@ const register = async (req, res) => {
       email,
       password: hashedPassword,
       phone: phone || "",
-      role: role === "admin" && process.env.ALLOW_ADMIN_REGISTER === "true" ? "admin" : "user",
+      role: "user",
     });
 
     return sendAuthResponse(res, user, 201);
@@ -106,6 +106,13 @@ const refreshToken = async (req, res) => {
     const newAccessToken = generateAccessToken(user._id, user.role);
     const newRefreshToken = generateRefreshToken(user._id);
     res.cookie("refreshToken", newRefreshToken, REFRESH_COOKIE_OPTIONS);
+    res.cookie("token", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+      path: "/",
+    });
 
     return res.json({
       accessToken: newAccessToken,

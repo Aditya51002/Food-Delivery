@@ -6,7 +6,7 @@ router.use(protect);
 
 router.post("/", addToCart);
 router.get("/", getCart);
+router.delete("/clear", clearCart);
 router.delete("/:foodId", removeFromCart);
-router.delete("/", clearCart);
 
 module.exports = router;
