@@ -4,6 +4,7 @@ import API from "../utils/api";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import Lottie from "lottie-react";
 import { FiShoppingCart, FiStar, FiZap, FiClock, FiTruck, FiSearch, FiMapPin } from "react-icons/fi";
 import {
   MdOutlineLocalFireDepartment,
@@ -292,6 +293,15 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState(null);
   const [activeTab, setActiveTab] = useState("food");
+  const [heroAnimation, setHeroAnimation] = useState(null);
+
+  useEffect(() => {
+    // Attempting to fetch a dancing chef / premium food animation
+    fetch("https://assets3.lottiefiles.com/packages/lf20_cwA7Cn.json")
+      .then(res => res.json())
+      .then(data => setHeroAnimation(data))
+      .catch(() => console.error("Failed to load Lottie animation"));
+  }, []);
 
   const urlSearch = searchParams.get("search") || "";
 
@@ -360,8 +370,8 @@ const Home = () => {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] -translate-y-1/2 translate-x-1/3 rounded-full bg-rose-500/10 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] translate-y-1/3 -translate-x-1/4 rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none" />
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative z-10">
-          <div className="max-w-2xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative z-10 flex flex-col md:flex-row items-center gap-12">
+          <div className="max-w-2xl w-full md:w-1/2">
             <span className="inline-block bg-zinc-900/80 backdrop-blur-md text-rose-400 text-xs font-black px-4 py-1.5 rounded-full mb-6 tracking-[0.2em] border border-rose-500/30 uppercase shadow-[0_0_20px_rgba(244,63,94,0.15)]">
               🚀 Fast • Fresh • Premium
             </span>
@@ -397,6 +407,14 @@ const Home = () => {
                 </div>
               ))}
             </div>
+          </div>
+          
+          <div className="w-full md:w-1/2 flex justify-center mt-10 md:mt-0">
+            {heroAnimation ? (
+              <Lottie animationData={heroAnimation} loop={true} className="w-full max-w-[500px] drop-shadow-[0_0_50px_rgba(244,63,94,0.2)]" />
+            ) : (
+              <div className="w-64 h-64 border-4 border-rose-500/20 border-t-rose-500 rounded-full animate-spin"></div>
+            )}
           </div>
         </div>
       </div>

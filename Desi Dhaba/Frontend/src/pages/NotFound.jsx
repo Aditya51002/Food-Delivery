@@ -1,10 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MdOutlineRiceBowl } from "react-icons/md";
 import { FiArrowLeft, FiHome } from "react-icons/fi";
+import Lottie from "lottie-react";
 
 const NotFound = () => {
   const navigate = useNavigate();
+  const [animationData, setAnimationData] = useState(null);
+
+  useEffect(() => {
+    fetch("https://assets9.lottiefiles.com/datafiles/MUp3wlMDGtoK5FK/data.json")
+      .then(res => res.json())
+      .then(data => setAnimationData(data));
+  }, []);
 
   useEffect(() => {
     document.title = "404 — Page Not Found | Desi Dhaba";
@@ -15,8 +23,14 @@ const NotFound = () => {
     <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-4 text-center relative overflow-hidden">
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-rose-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(244,63,94,0.3)] bg-gradient-to-br from-rose-500 to-amber-500 relative z-10">
-        <MdOutlineRiceBowl size={40} className="text-white" />
+      <div className="w-48 h-48 mb-8 relative z-10 flex items-center justify-center">
+        {animationData ? (
+          <Lottie animationData={animationData} loop={true} />
+        ) : (
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(244,63,94,0.3)] bg-gradient-to-br from-rose-500 to-amber-500">
+            <MdOutlineRiceBowl size={40} className="text-white" />
+          </div>
+        )}
       </div>
 
       <h1

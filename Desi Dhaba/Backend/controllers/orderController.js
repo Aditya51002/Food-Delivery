@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Coupon = require("../models/Coupon");
+const DeliveryLocation = require("../models/DeliveryLocation");
 const mongoose = require("mongoose");
 
 const TAX_RATE = 0.05;
@@ -8,17 +9,12 @@ const DELIVERY_FEE_BASE = 30;
 const FREE_DELIVERY_THRESHOLD = 500;
 
 const placeOrder = async (req, res) => {
-  const session = await mongoose.startSession();
-
   try {
     let createdOrder;
 
-    await session.withTransaction(async () => {
-      const { deliveryAddress, paymentMethod, orderNote, couponCode } = req.body;
+    const { deliveryAddress, paymentMethod, orderNote, couponCode } = req.body;
 
-      const cart = await Cart.findOne({ userId: req.user._id })
-        .populate("items.foodId")
-        .session(session);
+    const cart = await Cart.findOne({ userId: req.user._id }).populate("items.foodId");
 
       if (!cart || cart.items.length === 0) {
         throw Object.assign(new Error("Your cart is empty"), { statusCode: 400 });
@@ -53,7 +49,7 @@ const placeOrder = async (req, res) => {
         const coupon = await Coupon.findOne({
           code: couponCode.toUpperCase().trim(),
           isActive: true,
-        }).session(session);
+        });
 
         if (coupon && (!coupon.expiresAt || new Date() <= coupon.expiresAt)) {
           if (subtotal >= coupon.minOrderAmount) {
@@ -78,8 +74,7 @@ const placeOrder = async (req, res) => {
                 {
                   $push: { usedBy: { userId: req.user._id } },
                   $inc: { usedCount: 1 },
-                },
-                { session }
+                }
               );
             }
           }
@@ -90,35 +85,27 @@ const placeOrder = async (req, res) => {
       const estimatedDelivery = new Date(Date.now() + 45 * 60 * 1000);
       const paymentStatus = "Pending";
 
-      [createdOrder] = await Order.create(
-        [
-          {
-            userId: req.user._id,
-            items: orderItems,
-            subtotal,
-            deliveryFee,
-            taxAmount,
-            discount,
-            totalAmount,
-            couponCode: appliedCouponCode,
-            deliveryAddress: deliveryAddress.trim(),
-            orderNote: orderNote?.trim() || "",
-            paymentMethod: paymentMethod || "COD",
-            paymentStatus,
-            status: "Pending",
-            estimatedDelivery,
-            timeline: [{ status: "Pending", note: "Order placed successfully" }],
-          },
-        ],
-        { session }
-      );
+      const newOrderData = {
+        userId: req.user._id,
+        items: orderItems,
+        subtotal,
+        deliveryFee,
+        taxAmount,
+        discount,
+        totalAmount,
+        couponCode: appliedCouponCode,
+        deliveryAddress: deliveryAddress.trim(),
+        orderNote: orderNote?.trim() || "",
+        paymentMethod: paymentMethod || "COD",
+        paymentStatus,
+        status: "Pending",
+        estimatedDelivery,
+        timeline: [{ status: "Pending", note: "Order placed successfully" }],
+      };
 
-      await Cart.findByIdAndUpdate(
-        cart._id,
-        { items: [], totalAmount: 0 },
-        { session }
-      );
-    });
+      createdOrder = await Order.create(newOrderData);
+
+      await Cart.findByIdAndUpdate(cart._id, { items: [], totalAmount: 0 });
 
     if (!createdOrder) {
       return res.status(500).json({ message: "Order could not be created. Please try again." });
@@ -128,8 +115,6 @@ const placeOrder = async (req, res) => {
   } catch (error) {
     const statusCode = error.statusCode || 500;
     res.status(statusCode).json({ message: error.message || "Server error" });
-  } finally {
-    session.endSession();
   }
 };
 
@@ -319,7 +304,29 @@ const reorder = async (req, res) => {
   }
 };
 
+const getDeliveryLocation = async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+
+    const location = await DeliveryLocation.findOne({ orderId: req.params.id });
+    if (!location) {
+      return res.status(404).json({ message: "Location not found for this order" });
+    }
+
+    res.json({
+      lat: location.lat,
+      lng: location.lng,
+      updatedAt: location.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   placeOrder, getUserOrders, getOrderById,
   cancelOrder, getAllOrders, updateOrderStatus, reorder,
+  getDeliveryLocation,
 };

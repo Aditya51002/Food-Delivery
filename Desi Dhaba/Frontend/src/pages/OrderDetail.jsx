@@ -9,6 +9,7 @@ import {
 } from "react-icons/fi";
 import { MdOutlineRestaurant } from "react-icons/md";
 import ReviewModal from "../components/ReviewModal";
+import LiveTrackingMap from "../components/LiveTrackingMap";
 
 const SOCKET_URL = import.meta.env.VITE_API_URL?.replace("/api/v1", "") || "http://localhost:5000";
 
@@ -25,6 +26,7 @@ const OrderDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [activeSocket, setActiveSocket] = useState(null);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -63,8 +65,11 @@ const OrderDetail = () => {
       }));
     });
 
+    setActiveSocket(socket);
+
     return () => {
       socket.disconnect();
+      setActiveSocket(null);
     };
   }, [order?._id, order?.status]);
 
@@ -182,7 +187,16 @@ const OrderDetail = () => {
               </div>
             )}
 
-            <div className="relative z-10 pt-4 border-t border-white/5">
+            {/* LIVE TRACKING MAP (Only active when Out for Delivery) */}
+            {order.status === "Out for Delivery" && activeSocket && (
+              <LiveTrackingMap 
+                orderId={order._id} 
+                deliveryAddress={order.deliveryAddress} 
+                socket={activeSocket} 
+              />
+            )}
+
+            <div className="relative z-10 pt-4 border-t border-white/5 mt-8">
               <h3 className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
                 <FiClock className="text-rose-500" /> Activity Log
               </h3>

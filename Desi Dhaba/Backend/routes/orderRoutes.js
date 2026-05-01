@@ -7,6 +7,7 @@ const {
   getAllOrders,
   updateOrderStatus,
   reorder,
+  getDeliveryLocation,
 } = require("../controllers/orderController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 
@@ -19,6 +20,7 @@ router.get("/", adminOnly, getAllOrders);
 router.get("/:id", getOrderById);
 router.post("/:id/cancel", cancelOrder);
 router.post("/:id/reorder", reorder);
+router.get("/:id/location", getDeliveryLocation);
 
 router.patch("/:id/status", adminOnly, updateOrderStatus);
 

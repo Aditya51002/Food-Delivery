@@ -3,10 +3,20 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FiTrash2, FiPlus, FiMinus, FiShoppingBag, FiArrowRight } from "react-icons/fi";
 import { MdOutlineRestaurant } from "react-icons/md";
+import Lottie from "lottie-react";
+import { useState, useEffect } from "react";
 
 const Cart = () => {
   const { cart, addToCart, removeFromCart, loading } = useCart();
   const navigate = useNavigate();
+  const [emptyCartAnimation, setEmptyCartAnimation] = useState(null);
+
+  useEffect(() => {
+    // Delivery scooter animation for empty cart motivation
+    fetch("https://assets3.lottiefiles.com/packages/lf20_ucbyrun5.json")
+      .then(res => res.json())
+      .then(data => setEmptyCartAnimation(data));
+  }, []);
 
   const handleQuantityChange = async (foodId, currentQty, delta) => {
     const newQty = currentQty + delta;
@@ -42,8 +52,14 @@ const Cart = () => {
   if (!cart.items || cart.items.length === 0) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-24 text-center">
-        <div className="bg-zinc-900/50 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-          <FiShoppingBag size={48} className="text-zinc-500" />
+        <div className="flex items-center justify-center mx-auto mb-6">
+          {emptyCartAnimation ? (
+            <Lottie animationData={emptyCartAnimation} loop={true} className="w-64 h-64 drop-shadow-[0_0_30px_rgba(244,63,94,0.3)]" />
+          ) : (
+            <div className="bg-zinc-900/50 w-32 h-32 rounded-full flex items-center justify-center border border-white/5 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+              <FiShoppingBag size={48} className="text-zinc-500" />
+            </div>
+          )}
         </div>
         <h2 className="text-3xl font-black text-white mb-3 tracking-tight">Your order is empty</h2>
         <p className="text-zinc-400 mb-8 font-medium">Add some exquisite items from our premium masterclasses.</p>

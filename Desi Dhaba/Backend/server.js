@@ -35,6 +35,56 @@ io.on("connection", (sock) => {
 
   sock.on("join_order", (orderId) => {
     sock.join(`order_${orderId}`);
+    console.log(`👥 Socket ${sock.id} joined room: order_${orderId}`);
+  });
+
+  // ZOMATO-LIKE FEATURE: Listen for delivery agent sending location
+  sock.on("send_location", async (data) => {
+    try {
+      const { orderId, lat, lng } = data;
+      if (!orderId || !lat || !lng) return;
+
+      // Dynamically require model to avoid circular dependency or initialization issues
+      const DeliveryLocation = require("./models/DeliveryLocation");
+
+      // Upsert: Create if doesn't exist, update if it does
+      await DeliveryLocation.findOneAndUpdate(
+        { orderId },
+        { lat, lng, updatedAt: new Date() },
+        { upsert: true, new: true }
+      );
+
+      // Broadcast location strictly to users watching this specific order
+      io.to(`order_${orderId}`).emit("receive_location", { lat, lng });
+    } catch (err) {
+      console.error("❌ Error processing delivery location:", err);
+    }
+  });
+
+  // OPTIONAL ENHANCEMENT: Listen for real-time status updates from delivery agent
+  sock.on("update_status", async (data) => {
+    try {
+      const { orderId, status } = data;
+      if (!orderId || !status) return;
+
+      const Order = require("./models/Order");
+      
+      // Update the DB
+      const order = await Order.findById(orderId);
+      if (order) {
+        order.status = status;
+        order.timeline.push({ status, note: `Status updated to ${status} via tracking app` });
+        await order.save();
+        
+        // Broadcast the updated status to the room
+        io.to(`order_${orderId}`).emit("order:updated", { 
+          status: order.status, 
+          timeline: order.timeline 
+        });
+      }
+    } catch (err) {
+      console.error("❌ Error updating status via socket:", err);
+    }
   });
 
   sock.on("disconnect", () => {
