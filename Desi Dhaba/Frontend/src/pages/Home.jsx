@@ -297,7 +297,10 @@ const Home = () => {
 
   useEffect(() => {
     // Attempting to fetch a dancing chef / premium food animation
-    fetch("https://assets3.lottiefiles.com/packages/lf20_cwA7Cn.json")
+    // TODO: Replace this URL with the JSON URL of the chef animation you found on LottieFiles!
+    const CHEF_LOTTIE_URL = "https://assets8.lottiefiles.com/packages/lf20_V9t630.json";
+    
+    fetch(CHEF_LOTTIE_URL)
       .then(res => res.json())
       .then(data => setHeroAnimation(data))
       .catch(() => console.error("Failed to load Lottie animation"));
